@@ -1,10 +1,13 @@
 <template>
-  <div
-    class="layout-box"
-    :class="className"
-    :style="{ ...style, ...structure?.style }"
-    :data-id="structure?.id"
-    :data-type="structure?.type"
+  <DevVue
+    dev
+    :props="{
+      class: className,
+      style: { ...style, ...structure?.style },
+      'data-uuid': structure?.uuid,
+      'data-id': structure?.id,
+      'data-type': structure?.type,
+    }"
   >
     <template v-if="structure?.type === 'block'">
       <Box v-for="(item, index) in structure.children" :key="index" :structure="item">
@@ -37,12 +40,13 @@
     <div v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
       <slot :name="structure.id" />
     </div>
-  </div>
+  </DevVue>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { StructureProps } from '../../types';
+import DevVue from './dev.vue';
 
 defineOptions({
   name: 'Box',

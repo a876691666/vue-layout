@@ -9,11 +9,16 @@
 <script setup lang="ts">
 import { StructureProps } from '../../types';
 import BoxVue from '../Box';
+import { useStructure } from '../../core/useStructure';
 
-withDefaults(defineProps<StructureProps>(), {
+const props: StructureProps = withDefaults(defineProps<StructureProps>(), {
   style: () => ({
     width: '1920px',
     height: '1080px',
   }),
 });
+
+const { structure, setStructure } = useStructure();
+
+setStructure(props.structure);
 </script>
