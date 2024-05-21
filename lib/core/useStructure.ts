@@ -1,4 +1,4 @@
-import { Ref, ref } from 'vue';
+import { Ref, onMounted, onUnmounted, ref } from 'vue';
 import { StructureItem } from '../types';
 import { v5 } from 'uuid';
 
@@ -35,6 +35,8 @@ const cacheMap: Record<
     selectParentStructure: Ref<string[]>;
   }
 > = {};
+
+const isAlt = ref(false);
 
 export const useStructure = (id: string) => {
   let _structureMap = new Map<string, StructureItem>();
@@ -87,6 +89,28 @@ export const useStructure = (id: string) => {
     _structure.value = structure;
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Alt') {
+      isAlt.value = true;
+    }
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Alt') {
+      isAlt.value = false;
+    }
+  };
+
+  onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+  });
+
   const getMousePointStructure = (event: MouseEvent): StructureItem | null => {
     let result: StructureItem | null = null;
     // 最近的一个包含data-uuid属性的元素
@@ -95,6 +119,10 @@ export const useStructure = (id: string) => {
     const parentUuids = getParentUuids(selectUuid);
     selectParentStructure.value = parentUuids;
     const firstUuid = parentUuids[0];
+    const lastUuid = parentUuids[parentUuids.length - 1];
+    if (isAlt.value) {
+      return _structureMap.get(lastUuid) || null;
+    }
     if (!selectStructure.value) {
       return _structureMap.get(firstUuid) || null;
     }
