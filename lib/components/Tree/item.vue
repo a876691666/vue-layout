@@ -41,9 +41,9 @@ const { selectStructure, hoverStructure } = useStructure(props.id);
   padding: 2px;
 }
 .layout-tree-item-selected {
-  border: 1px solid red;
+  border: 3px solid red;
 }
 .layout-tree-item-hover {
-  border: 1px solid blue;
+  border: 5px solid green;
 }
 </style>

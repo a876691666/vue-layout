@@ -91,7 +91,7 @@ export const useStructure = (id: string) => {
     let result: StructureItem | null = null;
     // 最近的一个包含data-uuid属性的元素
     const selectUuid = findStructure(event.target as HTMLElement);
-    const oldParentUuids = selectParentStructure.value;
+    const oldParentUuids = getParentUuids(selectStructure.value?.uuid);
     const parentUuids = getParentUuids(selectUuid);
     selectParentStructure.value = parentUuids;
     const firstUuid = parentUuids[0];
@@ -101,7 +101,7 @@ export const useStructure = (id: string) => {
     if (!parentUuids.includes(selectStructure.value?.uuid || '')) {
       if (parentUuids.length >= oldParentUuids.length) {
         const nextUuidIndex = parentUuids.findIndex((uuid) => !oldParentUuids.includes(uuid));
-        if (nextUuidIndex === -1) return null;
+        if (nextUuidIndex === -1) return _structureMap.get(firstUuid) || null;
         result = _structureMap.get(parentUuids[nextUuidIndex]) || null;
       } else {
         const nextUuidIndex = oldParentUuids.findIndex((uuid) => !parentUuids.includes(uuid));
@@ -120,7 +120,7 @@ export const useStructure = (id: string) => {
       }
     } else {
       const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value?.uuid || '') + 1];
-      if (!nextUuid) return result;
+      if (!nextUuid) return selectStructure.value;
       result = _structureMap.get(nextUuid) || null;
     }
 
@@ -130,6 +130,8 @@ export const useStructure = (id: string) => {
   const handleSelectStructure = (event: MouseEvent) => {
     const structure = getMousePointStructure(event);
     selectStructure.value = structure;
+
+    handleHoverStructure(event);
   };
 
   const handleHoverStructure = (event: MouseEvent) => {
