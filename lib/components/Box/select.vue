@@ -1,28 +1,34 @@
 <template>
   <div
     class="layout-box-selected"
+    ref="domRef"
     :style="{
-      position: 'fixed',
+      position: 'absolute',
       left: rect?.left + 'px',
       top: rect?.top + 'px',
       width: rect?.width + 'px',
       height: rect?.height + 'px',
       pointerEvents: 'none',
+      transform: `translate(${-reoffset.x}px, ${-reoffset.y}px)`,
     }"
   >
     <div class="control-top" :class="{ 'control-disabled': selectStructure?.type !== 'position-leaf' }"></div>
     <div class="control-left" :class="{ 'control-disabled': selectStructure?.type !== 'position-leaf' }"></div>
-    <div class="control-right"></div>
+    <div class="control-right" @pointerdown="handleRightStart"></div>
     <div class="control-bottom" @pointerdown="handleBottomStart"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
 const { selectStructure } = useStructure();
 
 const rect = ref<DOMRect | null>(null);
+
+const realSize = ref({ width: 0, height: 0 });
+const sizeScale = ref({ x: 1, y: 1 });
+const reoffset = ref({ x: 0, y: 0 });
 
 const handleBottomStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
@@ -30,13 +36,10 @@ const handleBottomStart = (e: PointerEvent) => {
   const startHeight = rect.value?.height;
   const handleMove = (e: PointerEvent) => {
     if (!startHeight) return;
-    rect.value = {
-      ...rect.value!,
-      height: startHeight + e.clientY - startY,
-    };
+    rect.value = { ...rect.value!, height: startHeight + e.clientY - startY };
     if (selectStructure.value) {
       if (!selectStructure.value.style) selectStructure.value.style = {};
-      selectStructure.value.style.height = rect.value.height + 'px';
+      selectStructure.value.style.height = `${rect.value.height / sizeScale.value.y}px`;
     }
   };
   const handleEnd = () => {
@@ -47,11 +50,47 @@ const handleBottomStart = (e: PointerEvent) => {
   window.addEventListener('pointerup', handleEnd);
 };
 
+const handleRightStart = (e: PointerEvent) => {
+  if (!selectStructure.value) return;
+  const startX = e.clientX;
+  const startWidth = rect.value?.width;
+  const handleMove = (e: PointerEvent) => {
+    if (!startWidth) return;
+    rect.value = { ...rect.value!, width: startWidth + e.clientX - startX };
+    if (selectStructure.value) {
+      if (!selectStructure.value.style) selectStructure.value.style = {};
+      selectStructure.value.style.width = `${rect.value.width / sizeScale.value.x}px`;
+    }
+  };
+  const handleEnd = () => {
+    window.removeEventListener('pointermove', handleMove);
+    window.removeEventListener('pointerup', handleEnd);
+  };
+  window.addEventListener('pointermove', handleMove);
+  window.addEventListener('pointerup', handleEnd);
+};
+
+const domRef = ref<HTMLElement | null>(null);
+
 watch(selectStructure, (value) => {
   if (!value) return;
   const dom = document.querySelector(`.layout-box-dev-selected[data-uuid="${value.uuid}"]`);
   if (!dom) return;
+  updateOffset();
   rect.value = dom.getBoundingClientRect();
+  realSize.value = { width: dom.clientWidth, height: dom.clientHeight };
+  sizeScale.value = { x: rect.value.width / realSize.value.width, y: rect.value.height / realSize.value.height };
+});
+
+const updateOffset = () => {
+  if (!domRef.value) return;
+  const parent = domRef.value.parentElement;
+  const parentRect = parent?.getBoundingClientRect();
+  reoffset.value = { x: parentRect?.left || 0, y: parentRect?.top || 0 };
+};
+
+onMounted(() => {
+  updateOffset();
 });
 </script>
 <style scoped lang="less">

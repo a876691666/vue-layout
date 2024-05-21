@@ -70,7 +70,7 @@ const LayoutStructureProps: StructureProps = {
 </script>
 
 <template>
-  <div style="width: 1000px; height: 1000px; background-color: #ccc">
+  <div style="width: 1000px; height: 1000px; background-color: #ccc; position: relative">
     <div style="transform: scale(0.8); width: 100%; height: 100%">
       <LayoutStructure :="LayoutStructureProps">
         <template #logo>
@@ -84,8 +84,8 @@ const LayoutStructureProps: StructureProps = {
         </template>
       </LayoutStructure>
     </div>
+    <SelectVue />
   </div>
-  <SelectVue />
 </template>
 
 <style scoped>
