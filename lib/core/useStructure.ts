@@ -71,9 +71,25 @@ export const useStructure = () => {
       return;
     }
     if (!parentUuids.includes(selectStructure.value?.uuid || '')) {
-      const nextUuidIndex = parentUuids.findIndex((uuid) => !oldParentUuids.includes(uuid));
-      if (nextUuidIndex === -1) return;
-      selectStructure.value = _structureMap.get(parentUuids[nextUuidIndex]) || null;
+      if (parentUuids.length >= oldParentUuids.length) {
+        const nextUuidIndex = parentUuids.findIndex((uuid) => !oldParentUuids.includes(uuid));
+        if (nextUuidIndex === -1) return;
+        selectStructure.value = _structureMap.get(parentUuids[nextUuidIndex]) || null;
+      } else {
+        const nextUuidIndex = oldParentUuids.findIndex((uuid) => !parentUuids.includes(uuid));
+        if (nextUuidIndex === -1) {
+          const lastUuid = parentUuids[parentUuids.length - 1];
+          selectStructure.value = _structureMap.get(lastUuid) || null;
+        } else {
+          if (nextUuidIndex === parentUuids.length) {
+            const nextUuid = parentUuids[nextUuidIndex - 1];
+            selectStructure.value = _structureMap.get(nextUuid) || null;
+          } else {
+            const nextUuid = parentUuids[nextUuidIndex];
+            selectStructure.value = _structureMap.get(nextUuid) || null;
+          }
+        }
+      }
     } else {
       const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value.uuid || '') + 1];
       if (!nextUuid) return;

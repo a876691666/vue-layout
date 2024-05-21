@@ -37,16 +37,16 @@
         </template>
       </Box>
     </template>
-    <div v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
+    <template v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
       <slot :name="structure.id" />
-    </div>
+    </template>
   </DevVue>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { StructureProps } from '../../types';
-import DevVue from './dev.vue';
+import { DevVue } from '.';
 
 defineOptions({
   name: 'Box',

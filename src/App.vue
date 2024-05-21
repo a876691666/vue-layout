@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LayoutStructure } from '../lib';
+import { SelectVue } from '../lib/components/Box';
 import { StructureProps } from '../lib/types';
 
 const LayoutStructureProps: StructureProps = {
@@ -70,18 +71,21 @@ const LayoutStructureProps: StructureProps = {
 
 <template>
   <div style="width: 1000px; height: 1000px; background-color: #ccc">
-    <LayoutStructure :="LayoutStructureProps">
-      <template #logo>
-        <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
-      </template>
-      <template #menu>
-        <div style="width: 200px; height: 200px; background-color: #646cff"></div>
-      </template>
-      <template #content>
-        <div style="width: 100px; height: 100px; background-color: #42b883"></div>
-      </template>
-    </LayoutStructure>
+    <div style="transform: scale(0.8); width: 100%; height: 100%">
+      <LayoutStructure :="LayoutStructureProps">
+        <template #logo>
+          <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
+        </template>
+        <template #menu>
+          <div style="width: 200px; height: 200px; background-color: #646cff"></div>
+        </template>
+        <template #content>
+          <div style="width: 100px; height: 100px; background-color: #42b883"></div>
+        </template>
+      </LayoutStructure>
+    </div>
   </div>
+  <SelectVue />
 </template>
 
 <style scoped>

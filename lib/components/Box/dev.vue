@@ -31,6 +31,5 @@ const { handleSelectStructure, selectStructure } = useStructure();
 </script>
 <style scoped>
 .layout-box-dev-selected {
-  border: 1px solid #ff0000;
 }
 </style>
