@@ -1,6 +1,15 @@
 <template>
-  <div class="layout-tree-item" v-if="structure" :class="{ 'layout-tree-item-selected': selectStructure?.uuid === structure.uuid }">
-    <div @click="selectStructure = structure">{{ structure.uuid }} {{ structure.id }}</div>
+  <div
+    class="layout-tree-item"
+    v-if="structure"
+    :class="{
+      'layout-tree-item-selected': selectStructure?.uuid === structure.uuid,
+      'layout-tree-item-hover': hoverStructure?.uuid === structure.uuid,
+    }"
+  >
+    <div @click="selectStructure = structure" @pointerenter="hoverStructure = structure" @pointerleave="hoverStructure = null">
+      {{ structure.uuid }} {{ structure.id }}
+    </div>
     <template v-if="structure.children && structure.children.length">
       <Tree :id="$props.id" :structure="item" v-for="item in structure.children" :key="item.uuid"></Tree>
     </template>
@@ -23,7 +32,7 @@ const props: StructureProps = withDefaults(
   {}
 );
 
-const { selectStructure } = useStructure(props.id);
+const { selectStructure, hoverStructure } = useStructure(props.id);
 </script>
 <style scoped>
 .layout-tree-item {
@@ -33,5 +42,8 @@ const { selectStructure } = useStructure(props.id);
 }
 .layout-tree-item-selected {
   border: 1px solid red;
+}
+.layout-tree-item-hover {
+  border: 1px solid blue;
 }
 </style>

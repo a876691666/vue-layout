@@ -5,6 +5,7 @@
     :props="{
       class: className,
       style: { ...style, ...structure?.style },
+      structure: structure,
       'data-uuid': structure?.uuid,
       'data-id': structure?.id,
       'data-type': structure?.type,

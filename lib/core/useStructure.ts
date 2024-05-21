@@ -31,6 +31,7 @@ const cacheMap: Record<
     structure: Ref<StructureItem>;
     structureMap: Map<string, StructureItem>;
     selectStructure: Ref<StructureItem | null>;
+    hoverStructure: Ref<StructureItem | null>;
     selectParentStructure: Ref<string[]>;
   }
 > = {};
@@ -39,6 +40,7 @@ export const useStructure = (id: string) => {
   let _structureMap = new Map<string, StructureItem>();
   let _structure = ref();
   let selectStructure = ref<StructureItem | null>(null);
+  let hoverStructure = ref<StructureItem | null>(null);
   let selectParentStructure = ref<Array<string>>([]);
 
   if (!cacheMap[id]) {
@@ -46,12 +48,14 @@ export const useStructure = (id: string) => {
       structure: _structure,
       structureMap: _structureMap,
       selectStructure: selectStructure,
+      hoverStructure: hoverStructure,
       selectParentStructure: selectParentStructure,
     };
   } else {
     _structure = cacheMap[id].structure;
     _structureMap = cacheMap[id].structureMap;
     selectStructure = cacheMap[id].selectStructure;
+    hoverStructure = cacheMap[id].hoverStructure;
     selectParentStructure = cacheMap[id].selectParentStructure;
   }
 
@@ -83,7 +87,8 @@ export const useStructure = (id: string) => {
     _structure.value = structure;
   };
 
-  const handleSelectStructure = (event: MouseEvent) => {
+  const getMousePointStructure = (event: MouseEvent): StructureItem | null => {
+    let result: StructureItem | null = null;
     // 最近的一个包含data-uuid属性的元素
     const selectUuid = findStructure(event.target as HTMLElement);
     const oldParentUuids = selectParentStructure.value;
@@ -91,40 +96,53 @@ export const useStructure = (id: string) => {
     selectParentStructure.value = parentUuids;
     const firstUuid = parentUuids[0];
     if (!selectStructure.value) {
-      selectStructure.value = _structureMap.get(firstUuid) || null;
-      return;
+      return _structureMap.get(firstUuid) || null;
     }
     if (!parentUuids.includes(selectStructure.value?.uuid || '')) {
       if (parentUuids.length >= oldParentUuids.length) {
         const nextUuidIndex = parentUuids.findIndex((uuid) => !oldParentUuids.includes(uuid));
-        if (nextUuidIndex === -1) return;
-        selectStructure.value = _structureMap.get(parentUuids[nextUuidIndex]) || null;
+        if (nextUuidIndex === -1) return null;
+        result = _structureMap.get(parentUuids[nextUuidIndex]) || null;
       } else {
         const nextUuidIndex = oldParentUuids.findIndex((uuid) => !parentUuids.includes(uuid));
         if (nextUuidIndex === -1) {
           const lastUuid = parentUuids[parentUuids.length - 1];
-          selectStructure.value = _structureMap.get(lastUuid) || null;
+          result = _structureMap.get(lastUuid) || null;
         } else {
           if (nextUuidIndex === parentUuids.length) {
             const nextUuid = parentUuids[nextUuidIndex - 1];
-            selectStructure.value = _structureMap.get(nextUuid) || null;
+            result = _structureMap.get(nextUuid) || null;
           } else {
             const nextUuid = parentUuids[nextUuidIndex];
-            selectStructure.value = _structureMap.get(nextUuid) || null;
+            result = _structureMap.get(nextUuid) || null;
           }
         }
       }
     } else {
-      const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value.uuid || '') + 1];
-      if (!nextUuid) return;
-      selectStructure.value = _structureMap.get(nextUuid) || null;
+      const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value?.uuid || '') + 1];
+      if (!nextUuid) return result;
+      result = _structureMap.get(nextUuid) || null;
     }
+
+    return result;
+  };
+
+  const handleSelectStructure = (event: MouseEvent) => {
+    const structure = getMousePointStructure(event);
+    selectStructure.value = structure;
+  };
+
+  const handleHoverStructure = (event: MouseEvent) => {
+    const structure = getMousePointStructure(event);
+    hoverStructure.value = structure;
   };
 
   return {
     structure: _structure,
     selectStructure,
+    hoverStructure,
     handleSelectStructure,
+    handleHoverStructure,
     setStructure,
   };
 };

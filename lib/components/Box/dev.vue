@@ -4,7 +4,10 @@
     class="layout-box layout-box-dev"
     :class="{
       'layout-box-dev-selected': selectStructure?.uuid === $props.props['data-uuid'],
+      'layout-box-dev-hover': hoverStructure?.uuid === $props.props['data-uuid'],
     }"
+    @pointerenter="handleHoverStructure"
+    @pointerleave="hoverStructure = null"
     v-if="dev"
     @click.stop="handleSelectStructure"
   >
@@ -28,9 +31,11 @@ const props = withDefaults(
   }
 );
 
-const { handleSelectStructure, selectStructure } = useStructure(props.id);
+const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure } = useStructure(props.id);
 </script>
 <style scoped>
 .layout-box-dev-selected {
+}
+.layout-box-dev-hover {
 }
 </style>
