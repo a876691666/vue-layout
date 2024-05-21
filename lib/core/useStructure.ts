@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { StructureItem } from '../types';
 import { v5 } from 'uuid';
 
@@ -25,31 +25,55 @@ const setParentUuid = (structure: StructureItem, parentUuid?: string) => {
   }
 };
 
-const _structureMap = new Map<string, StructureItem>();
-const _structure = ref();
-const selectStructure = ref<StructureItem | null>(null);
-const selectParentStructure = ref<Array<string>>([]);
+const cacheMap: Record<
+  string,
+  {
+    structure: Ref<StructureItem>;
+    structureMap: Map<string, StructureItem>;
+    selectStructure: Ref<StructureItem | null>;
+    selectParentStructure: Ref<string[]>;
+  }
+> = {};
 
-const findStructure = (dom: HTMLElement): string | undefined => {
-  if (!dom) return;
+export const useStructure = (id: string) => {
+  let _structureMap = new Map<string, StructureItem>();
+  let _structure = ref();
+  let selectStructure = ref<StructureItem | null>(null);
+  let selectParentStructure = ref<Array<string>>([]);
 
-  const uuid = dom.getAttribute('data-uuid');
-  if (!uuid) return findStructure(dom.parentElement as HTMLElement);
+  if (!cacheMap[id]) {
+    cacheMap[id] = {
+      structure: _structure,
+      structureMap: _structureMap,
+      selectStructure: selectStructure,
+      selectParentStructure: selectParentStructure,
+    };
+  } else {
+    _structure = cacheMap[id].structure;
+    _structureMap = cacheMap[id].structureMap;
+    selectStructure = cacheMap[id].selectStructure;
+    selectParentStructure = cacheMap[id].selectParentStructure;
+  }
 
-  return _structureMap.get(uuid) && uuid;
-};
+  const findStructure = (dom: HTMLElement): string | undefined => {
+    if (!dom) return;
 
-// 获取父级链路上的所有uuid
-const getParentUuids = (uuid?: string): string[] => {
-  if (!uuid) return [];
+    const uuid = dom.getAttribute('data-uuid');
+    if (!uuid) return findStructure(dom.parentElement as HTMLElement);
 
-  const structure = _structureMap.get(uuid);
-  if (!structure) return [];
+    return _structureMap.get(uuid) && uuid;
+  };
 
-  return [...getParentUuids(structure.parentUuid), uuid];
-};
+  // 获取父级链路上的所有uuid
+  const getParentUuids = (uuid?: string): string[] => {
+    if (!uuid) return [];
 
-export const useStructure = () => {
+    const structure = _structureMap.get(uuid);
+    if (!structure) return [];
+
+    return [...getParentUuids(structure.parentUuid), uuid];
+  };
+
   const setStructure = (structure?: StructureItem) => {
     if (!structure) return;
 

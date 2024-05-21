@@ -7,55 +7,54 @@ export type StyleType = {
   height?: string;
 };
 
-export type LeafStructureItem = {
-  type: 'leaf';
-  id: string;
+export type BaseStructureItem = {
+  label?: string;
+  userData?: any;
+  id?: string;
   uuid?: string;
   parentUuid?: string;
   style?: StyleType;
+  children?: StructureItem[];
 };
+
+export type LeafStructureItem = {
+  type: 'leaf';
+} & BaseStructureItem;
 
 export type PositionStructureItem = {
   type: 'position';
-  id: string;
-  uuid?: string;
-  style?: StyleType;
-  parentUuid?: string;
   children?: PositionLeafStructureItem[];
-};
+} & BaseStructureItem;
 
 export type PositionLeafStructureItem = {
   type: 'position-leaf';
-  id?: string;
-  uuid?: string;
-  style?: StyleType;
-  parentUuid?: string;
-  children?: StructureItem[];
-};
+} & BaseStructureItem;
 
 export type BlockStructureItem = {
   type: 'block';
   full?: boolean;
-  id: string;
-  uuid?: string;
-  style?: StyleType;
-  parentUuid?: string;
-  children?: StructureItem[];
-};
+} & BaseStructureItem;
+
+export type VueStructureItem = {
+  type: 'vue';
+  component: string;
+} & BaseStructureItem;
 
 export type FlexStructureItem = {
   type: 'flex';
   direction?: 'row' | 'column';
-  id: string;
-  uuid?: string;
-  style?: StyleType;
-  parentUuid?: string;
-  children?: StructureItem[];
-};
+} & BaseStructureItem;
 
-export type StructureItem = LeafStructureItem | BlockStructureItem | FlexStructureItem | PositionStructureItem | PositionLeafStructureItem;
+export type StructureItem =
+  | LeafStructureItem
+  | BlockStructureItem
+  | FlexStructureItem
+  | PositionStructureItem
+  | PositionLeafStructureItem
+  | VueStructureItem;
 
 export type StructureProps = {
+  id: string;
   style?: StyleType;
   structure?: StructureItem;
 };

@@ -22,7 +22,9 @@
 import { onMounted, ref, watch } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure } = useStructure();
+const props = withDefaults(defineProps<{ id: string }>(), {});
+
+const { selectStructure } = useStructure(props.id);
 
 const rect = ref<DOMRect | null>(null);
 

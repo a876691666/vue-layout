@@ -1,5 +1,5 @@
 <template>
-  <BoxVue :structure="structure">
+  <BoxVue :structure="_structure" :id="$props.id">
     <template v-for="(_, name) in $slots" v-slot:[name]>
       <slot :name="name" />
     </template>
@@ -11,14 +11,14 @@ import { StructureProps } from '../../types';
 import BoxVue from '../Box';
 import { useStructure } from '../../core/useStructure';
 
-const props: StructureProps = withDefaults(defineProps<StructureProps>(), {
+const props = withDefaults(defineProps<StructureProps>(), {
   style: () => ({
     width: '1920px',
     height: '1080px',
   }),
 });
 
-const { structure, setStructure } = useStructure();
+const { structure: _structure, setStructure } = useStructure(props.id);
 
 setStructure(props.structure);
 </script>

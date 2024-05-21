@@ -1,9 +1,9 @@
 <template>
   <div
-    :="props"
+    :="$props.props"
     class="layout-box layout-box-dev"
     :class="{
-      'layout-box-dev-selected': selectStructure?.uuid === props['data-uuid'],
+      'layout-box-dev-selected': selectStructure?.uuid === $props.props['data-uuid'],
     }"
     v-if="dev"
     @click.stop="handleSelectStructure"
@@ -17,8 +17,9 @@
 <script setup lang="ts">
 import { useStructure } from '../../core/useStructure';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    id: string;
     dev?: boolean;
     props: any;
   }>(),
@@ -27,7 +28,7 @@ withDefaults(
   }
 );
 
-const { handleSelectStructure, selectStructure } = useStructure();
+const { handleSelectStructure, selectStructure } = useStructure(props.id);
 </script>
 <style scoped>
 .layout-box-dev-selected {
