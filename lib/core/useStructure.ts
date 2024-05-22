@@ -93,10 +93,16 @@ export const useStructure = (id: string) => {
     if (event.key === 'Alt') {
       isAlt.value = true;
     }
+    if (event.key === 'Meta') {
+      isAlt.value = true;
+    }
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === 'Alt') {
+      isAlt.value = false;
+    }
+    if (event.key === 'Meta') {
       isAlt.value = false;
     }
   };
