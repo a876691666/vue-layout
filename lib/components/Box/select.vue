@@ -34,6 +34,7 @@ const reoffset = ref({ x: 0, y: 0 });
 
 const handleBottomStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
+  updateRect();
   const startY = e.clientY;
   const startHeight = rect.value?.height;
   const handleMove = (e: PointerEvent) => {
@@ -54,6 +55,7 @@ const handleBottomStart = (e: PointerEvent) => {
 
 const handleRightStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
+  updateRect();
   const startX = e.clientX;
   const startWidth = rect.value?.width;
   const handleMove = (e: PointerEvent) => {
@@ -74,14 +76,18 @@ const handleRightStart = (e: PointerEvent) => {
 
 const domRef = ref<HTMLElement | null>(null);
 
-watch(selectStructure, (value) => {
-  if (!value) return;
-  const dom = document.querySelector(`.layout-box-dev-selected[data-uuid="${value.uuid}"]`);
+const updateRect = () => {
+  if (!selectStructure.value) return;
+  const dom = document.querySelector(`.layout-box-dev-selected[data-uuid="${selectStructure.value.uuid}"]`);
   if (!dom) return;
   updateOffset();
   rect.value = dom.getBoundingClientRect();
   realSize.value = { width: dom.clientWidth, height: dom.clientHeight };
   sizeScale.value = { x: rect.value.width / realSize.value.width, y: rect.value.height / realSize.value.height };
+};
+
+watch(selectStructure, () => {
+  updateRect();
 });
 
 const updateOffset = () => {
@@ -96,6 +102,10 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="less">
+.layout-box-selected {
+  // 禁止用户选择
+  user-select: none;
+}
 .control-bottom {
   position: absolute;
   bottom: -2.5px;

@@ -8,10 +8,16 @@
     }"
   >
     <div @click="selectStructure = structure" @pointerenter="hoverStructure = structure" @pointerleave="hoverStructure = null">
-      {{ structure.uuid }} {{ structure.id }}
+      <slot :structure="structure" :isSelect="selectStructure?.uuid === structure.uuid" :isHover="hoverStructure?.uuid === structure.uuid">
+        {{ structure.uuid }} {{ structure.id }}
+      </slot>
     </div>
     <template v-if="structure.children && structure.children.length">
-      <Tree :id="$props.id" :structure="item" v-for="item in structure.children" :key="item.uuid"></Tree>
+      <TreeItem :id="$props.id" :structure="item" v-for="item in structure.children" :key="item.uuid">
+        <template #default="defaultProps">
+          <slot :="defaultProps" />
+        </template>
+      </TreeItem>
     </template>
   </div>
 </template>
@@ -21,8 +27,12 @@ import { StructureItem, StructureProps } from '../../types';
 import { useStructure } from '../../core/useStructure';
 
 defineOptions({
-  name: 'Tree',
+  name: 'TreeItem',
 });
+
+defineSlots<{
+  default(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any;
+}>();
 
 const props: StructureProps = withDefaults(
   defineProps<{
@@ -36,9 +46,9 @@ const { selectStructure, hoverStructure } = useStructure(props.id);
 </script>
 <style scoped>
 .layout-tree-item {
-  padding-left: 10px;
   border: 1px solid #000;
   padding: 2px;
+  padding-left: 10px;
 }
 .layout-tree-item-selected {
   border: 3px solid red;

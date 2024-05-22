@@ -1,6 +1,10 @@
 <template>
   <div class="layout-tree" v-if="structure">
-    <TreeItem :id="props.id" :structure="structure"></TreeItem>
+    <TreeItem :id="props.id" :structure="structure">
+      <template #default="{ structure }">
+        {{ structure.uuid }}
+      </template>
+    </TreeItem>
   </div>
 </template>
 
