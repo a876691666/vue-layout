@@ -38,12 +38,14 @@ const cacheMap: Record<
 
 const isAlt = ref(false);
 
-export const useStructure = (id: string) => {
+export const useStructure = (_id?: string) => {
   let _structureMap = new Map<string, StructureItem>();
   let _structure = ref();
   let selectStructure = ref<StructureItem | null>(null);
   let hoverStructure = ref<StructureItem | null>(null);
   let selectParentStructure = ref<Array<string>>([]);
+
+  const id = _id || 'default';
 
   if (!cacheMap[id]) {
     cacheMap[id] = {

@@ -1,28 +1,24 @@
 <template>
   <div class="layout-tree" v-if="structure">
-    <TreeItem :id="props.id" :structure="structure">
-      <template #default="{ structure }">
-        {{ structure.uuid }}
+    <LayoutTreeItem :structure="structure">
+      <template #default="props">
+        <slot name="item" :structure="props.structure" :isSelect="props.isSelect" :isHover="props.isHover">
+          {{ props.structure.uuid }}
+        </slot>
       </template>
-    </TreeItem>
+    </LayoutTreeItem>
   </div>
 </template>
 
 <script setup lang="ts">
-import { StructureProps } from '../../types';
+import { StructureItem } from '../../types';
 import { useStructure } from '../../core/useStructure';
-import TreeItem from './item.vue';
+import LayoutTreeItem from './item.vue';
+import { inject } from 'vue';
 
-defineOptions({
-  name: 'Tree',
-});
+defineOptions({ name: 'LayoutTree' });
 
-const props: StructureProps = withDefaults(
-  defineProps<{
-    id: string;
-  }>(),
-  {}
-);
+defineSlots<{ item(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any }>();
 
-const { structure } = useStructure(props.id);
+const { structure } = useStructure(inject('structureId'));
 </script>

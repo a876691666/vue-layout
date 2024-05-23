@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { LayoutStructure } from '../lib';
-import { SelectVue } from '../lib/components/Box';
-import TreeVue from '../lib/components/Tree';
-import { StructureItem } from '../lib/types';
+import { LayoutStructure, LayoutStructureProvide, LayoutSelect, LayoutTree, StructureItem, useStructure } from '../lib';
 
 const LayoutStructureProps = {
   style: { width: '100%', height: '100%' },
@@ -27,29 +24,40 @@ const LayoutStructureProps = {
     ],
   } as StructureItem,
 };
+
+const { selectStructure } = useStructure('main');
 </script>
 
 <template>
+  {{ selectStructure?.id }}
   <div class="flex">
-    <div class="w-48">
-      <TreeVue id="main" />
-    </div>
-    <div style="width: 1000px; height: 1000px; background-color: #ccc; position: relative" class="w-full">
-      <div style="transform: scale(0.8); width: 100%; height: 100%">
-        <LayoutStructure :structure="LayoutStructureProps.structure" id="main" :style="LayoutStructureProps.style">
-          <template #logo>
-            <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
+    <LayoutStructureProvide id="main">
+      <div class="w-48">
+        <LayoutTree>
+          <template #item="{ structure, isSelect, isHover }">
+            <div :class="{ 'layout-tree-item-selected': isSelect, 'layout-tree-item-hover': isHover }">
+              {{ structure.id }}
+            </div>
           </template>
-          <template #menu>
-            <div style="width: 200px; height: 200px; background-color: #646cff"></div>
-          </template>
-          <template #content>
-            <div style="width: 100px; height: 100px; background-color: #42b883"></div>
-          </template>
-        </LayoutStructure>
+        </LayoutTree>
       </div>
-      <SelectVue id="main" />
-    </div>
+      <div style="width: 1000px; height: 1000px; background-color: #ccc; position: relative" class="w-full">
+        <div style="transform: scale(0.8); width: 100%; height: 100%">
+          <LayoutStructure :structure="LayoutStructureProps.structure" :style="LayoutStructureProps.style">
+            <template #logo>
+              <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
+            </template>
+            <template #menu>
+              <div style="width: 200px; height: 200px; background-color: #646cff"></div>
+            </template>
+            <template #content>
+              <div style="width: 100px; height: 100px; background-color: #42b883"></div>
+            </template>
+          </LayoutStructure>
+        </div>
+        <LayoutSelect />
+      </div>
+    </LayoutStructureProvide>
   </div>
 </template>
 

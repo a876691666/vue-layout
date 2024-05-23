@@ -19,12 +19,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const props = withDefaults(defineProps<{ id: string }>(), {});
-
-const { selectStructure } = useStructure(props.id);
+const { selectStructure } = useStructure(inject('structureId'));
 
 const rect = ref<DOMRect | null>(null);
 

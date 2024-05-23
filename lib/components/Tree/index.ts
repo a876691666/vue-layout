@@ -1,3 +1,3 @@
-import TreeVue from './index.vue';
+import LayoutTree from './index.vue';
 
-export default TreeVue;
+export { LayoutTree };

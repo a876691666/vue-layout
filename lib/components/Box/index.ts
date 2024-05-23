@@ -1,6 +1,5 @@
-import BoxVue from './index.vue';
-import DevVue from './dev.vue';
-import SelectVue from './select.vue';
+import LayoutBox from './index.vue';
+import LayoutDevBox from './dev.vue';
+import LayoutSelect from './select.vue';
 
-export default BoxVue;
-export { DevVue, SelectVue };
+export { LayoutBox, LayoutDevBox, LayoutSelect };

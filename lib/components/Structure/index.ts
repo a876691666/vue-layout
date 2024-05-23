@@ -1,3 +1,4 @@
-import StructureVue from './index.vue';
+import LayoutStructure from './index.vue';
+import LayoutStructureProvide from './provide.vue';
 
-export default StructureVue;
+export { LayoutStructure, LayoutStructureProvide };

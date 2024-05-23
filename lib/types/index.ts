@@ -52,9 +52,3 @@ export type StructureItem =
   | PositionStructureItem
   | PositionLeafStructureItem
   | VueStructureItem;
-
-export type StructureProps = {
-  id: string;
-  style?: StyleType;
-  structure?: StructureItem;
-};

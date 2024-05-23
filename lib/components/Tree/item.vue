@@ -13,36 +13,27 @@
       </slot>
     </div>
     <template v-if="structure.children && structure.children.length">
-      <TreeItem :id="$props.id" :structure="item" v-for="item in structure.children" :key="item.uuid">
+      <LayoutTreeItem :structure="item" v-for="item in structure.children" :key="item.uuid">
         <template #default="defaultProps">
           <slot :="defaultProps" />
         </template>
-      </TreeItem>
+      </LayoutTreeItem>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { StructureItem, StructureProps } from '../../types';
+import { StructureItem } from '../../types';
 import { useStructure } from '../../core/useStructure';
+import { inject } from 'vue';
 
-defineOptions({
-  name: 'TreeItem',
-});
+defineOptions({ name: 'LayoutTreeItem' });
 
-defineSlots<{
-  default(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any;
-}>();
+defineSlots<{ default(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any }>();
 
-const props: StructureProps = withDefaults(
-  defineProps<{
-    id: string;
-    structure?: StructureItem;
-  }>(),
-  {}
-);
+withDefaults(defineProps<{ structure?: StructureItem }>(), {});
 
-const { selectStructure, hoverStructure } = useStructure(props.id);
+const { selectStructure, hoverStructure } = useStructure(inject('structureId'));
 </script>
 <style scoped>
 .layout-tree-item {

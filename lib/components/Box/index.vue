@@ -1,6 +1,5 @@
 <template>
-  <DevVue
-    :id="$props.id"
+  <LayoutDevBox
     dev
     :props="{
       class: className,
@@ -12,63 +11,59 @@
     }"
   >
     <template v-if="structure?.type === 'block'">
-      <Box v-for="(item, index) in structure.children" :key="index" :structure="item" :id="$props.id">
+      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
         <template v-for="(_, name) in $slots" v-slot:[name]>
           <slot :name="name" />
         </template>
-      </Box>
+      </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
-      <Box v-for="(item, index) in structure.children" :key="index" :structure="item" :id="$props.id">
+      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
         <template v-for="(_, name) in $slots" v-slot:[name]>
           <slot :name="name" />
         </template>
-      </Box>
+      </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
-      <Box v-for="(item, index) in structure.children" :key="index" :structure="item" :id="$props.id">
+      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
         <template v-for="(_, name) in $slots" v-slot:[name]>
           <slot :name="name" />
         </template>
-      </Box>
+      </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'position-leaf'" class="relative" :data-id="structure.id">
       <template v-if="structure.children">
-        <Box v-for="(item, index) in structure.children" :key="index" :structure="item" :id="$props.id">
+        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" v-slot:[name]>
             <slot :name="name" />
           </template>
-        </Box>
+        </LayoutBox>
       </template>
       <slot :name="structure.id" v-else-if="structure.id" />
     </template>
     <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
       <component :is="structure.component">
-        <Box v-for="(item, index) in structure.children" :key="index" :structure="item" :id="$props.id">
+        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" v-slot:[name]>
             <slot :name="name" />
           </template>
-        </Box>
+        </LayoutBox>
       </component>
     </template>
     <template v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
       <slot :name="structure.id" />
     </template>
-  </DevVue>
+  </LayoutDevBox>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { StructureProps } from '../../types';
-import { DevVue } from '.';
+import { StructureItem, StyleType } from '../../types';
+import { LayoutDevBox } from '.';
 
-defineOptions({
-  name: 'Box',
-});
+defineOptions({ name: 'LayoutBox' });
 
-const props = withDefaults(defineProps<StructureProps>(), {
-  style: () => ({}),
-});
+const props = withDefaults(defineProps<{ style?: StyleType; structure?: StructureItem }>(), { style: () => ({}) });
 
 const layoutType = ref(props.structure?.type);
 
