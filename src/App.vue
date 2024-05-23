@@ -31,7 +31,7 @@ const { selectStructure } = useStructure('main');
 <template>
   {{ selectStructure?.id }}
   <div class="flex">
-    <LayoutStructureProvide id="main">
+    <LayoutStructureProvide id="main" :structure="LayoutStructureProps.structure">
       <div class="w-48">
         <LayoutTree>
           <template #item="{ structure, isSelect, isHover }">
@@ -43,7 +43,7 @@ const { selectStructure } = useStructure('main');
       </div>
       <div style="width: 1000px; height: 1000px; background-color: #ccc; position: relative" class="w-full">
         <div style="transform: scale(0.8); width: 100%; height: 100%">
-          <LayoutStructure :structure="LayoutStructureProps.structure" :style="LayoutStructureProps.style">
+          <LayoutStructure :style="LayoutStructureProps.style">
             <template #logo>
               <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
             </template>
