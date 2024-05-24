@@ -7,7 +7,7 @@
       'layout-box-dev-hover': hoverStructure?.uuid === $props.props['data-uuid'],
     }"
     @pointerenter="handleHoverStructure"
-    @pointerleave="hoverStructure = null"
+    @pointerleave="hoverStructure = undefined"
     v-if="dev"
     @click.stop="handleSelectStructure"
   >

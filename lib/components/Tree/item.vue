@@ -7,7 +7,7 @@
       'layout-tree-item-hover': hoverStructure?.uuid === structure.uuid,
     }"
   >
-    <div @click="selectStructure = structure" @pointerenter="hoverStructure = structure" @pointerleave="hoverStructure = null">
+    <div @click="selectStructure = structure" @pointerenter="hoverStructure = structure" @pointerleave="hoverStructure = undefined">
       <slot :structure="structure" :isSelect="selectStructure?.uuid === structure.uuid" :isHover="hoverStructure?.uuid === structure.uuid">
         {{ structure.uuid }} {{ structure.id }}
       </slot>
