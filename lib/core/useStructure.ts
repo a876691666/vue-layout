@@ -41,8 +41,8 @@ const isAlt = ref(false);
 export const useStructure = (_id?: string) => {
   let _structureMap = new Map<string, StructureItem>();
   let _structure = ref();
-  let selectStructure = ref<StructureItem | null>(null);
-  let hoverStructure = ref<StructureItem | null>(null);
+  let selectStructure: Ref<StructureItem | null> = ref<StructureItem | null>(null);
+  let hoverStructure: Ref<StructureItem | null> = ref<StructureItem | null>(null);
   let selectParentStructure = ref<Array<string>>([]);
 
   const id = _id || 'default';
