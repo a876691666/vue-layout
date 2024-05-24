@@ -16,6 +16,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css"
     }
   },
   "dependencies": {
