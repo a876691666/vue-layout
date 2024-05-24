@@ -1,5 +1,5 @@
-import { Ref, onMounted, onUnmounted, ref } from 'vue';
-import { StructureItem } from '../types';
+import { Ref, onMounted, onUnmounted, ref, watch } from 'vue';
+import { StructureItem, StyleType } from '../types';
 import { v5 } from 'uuid';
 
 // 递归设置结构的uuid
@@ -28,10 +28,11 @@ const setParentUuid = (structure: StructureItem, parentUuid?: string) => {
 const cacheMap: Record<
   string,
   {
-    structure: Ref<StructureItem>;
+    structure: Ref<StructureItem | undefined>;
     structureMap: Map<string, StructureItem>;
-    selectStructure: Ref<StructureItem | null>;
-    hoverStructure: Ref<StructureItem | null>;
+    structureStyleMap: Map<string, Ref<StyleType>>;
+    selectStructure: Ref<StructureItem | undefined>;
+    hoverStructure: Ref<StructureItem | undefined>;
     selectParentStructure: Ref<string[]>;
   }
 > = {};
@@ -39,10 +40,11 @@ const cacheMap: Record<
 const isAlt = ref(false);
 
 export const useStructure = (_id?: string) => {
+  let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let _structureMap = new Map<string, StructureItem>();
-  let _structure = ref();
-  let selectStructure: Ref<StructureItem | null> = ref<StructureItem | null>(null);
-  let hoverStructure: Ref<StructureItem | null> = ref<StructureItem | null>(null);
+  let _structureStyleMap = new Map<string, Ref<StyleType>>();
+  let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
+  let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
 
   const id = _id || 'default';
@@ -51,6 +53,7 @@ export const useStructure = (_id?: string) => {
     cacheMap[id] = {
       structure: _structure,
       structureMap: _structureMap,
+      structureStyleMap: _structureStyleMap,
       selectStructure: selectStructure,
       hoverStructure: hoverStructure,
       selectParentStructure: selectParentStructure,
@@ -58,6 +61,7 @@ export const useStructure = (_id?: string) => {
   } else {
     _structure = cacheMap[id].structure;
     _structureMap = cacheMap[id].structureMap;
+    _structureStyleMap = cacheMap[id].structureStyleMap;
     selectStructure = cacheMap[id].selectStructure;
     hoverStructure = cacheMap[id].hoverStructure;
     selectParentStructure = cacheMap[id].selectParentStructure;
@@ -82,6 +86,17 @@ export const useStructure = (_id?: string) => {
     return [...getParentUuids(structure.parentUuid), uuid];
   };
 
+  const createStyleRef = (uuid: string) => {
+    const styleRef = ref<StyleType>(_structureMap.get(uuid)?.style || {});
+
+    watch(styleRef, (style) => {
+      if (!_structureMap.get(uuid)) return;
+      _structureMap.get(uuid)!.style = style;
+    });
+
+    return styleRef;
+  };
+
   const setStructure = (structure?: StructureItem) => {
     if (!structure) return;
 
@@ -89,6 +104,20 @@ export const useStructure = (_id?: string) => {
     setParentUuid(structure);
 
     _structure.value = structure;
+
+    _structureMap.forEach((_value, key) => {
+      _structureStyleMap.set(key, createStyleRef(key));
+    });
+  };
+
+  const getStyleRef = (uuid?: string) => {
+    if (!uuid) return;
+    let styleRef = _structureStyleMap.get(uuid);
+    if (!styleRef) {
+      styleRef = createStyleRef(uuid);
+      _structureStyleMap.set(uuid, styleRef);
+    }
+    return styleRef;
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -119,8 +148,8 @@ export const useStructure = (_id?: string) => {
     window.removeEventListener('keyup', handleKeyUp);
   });
 
-  const getMousePointStructure = (event: MouseEvent): StructureItem | null => {
-    let result: StructureItem | null = null;
+  const getMousePointStructure = (event: MouseEvent): StructureItem | undefined => {
+    let result: StructureItem | undefined;
     // 最近的一个包含data-uuid属性的元素
     const selectUuid = findStructure(event.target as HTMLElement);
     const oldParentUuids = getParentUuids(selectStructure.value?.uuid);
@@ -129,35 +158,35 @@ export const useStructure = (_id?: string) => {
     const firstUuid = parentUuids[0];
     const lastUuid = parentUuids[parentUuids.length - 1];
     if (isAlt.value) {
-      return _structureMap.get(lastUuid) || null;
+      return _structureMap.get(lastUuid);
     }
     if (!selectStructure.value) {
-      return _structureMap.get(firstUuid) || null;
+      return _structureMap.get(firstUuid);
     }
     if (!parentUuids.includes(selectStructure.value?.uuid || '')) {
       if (parentUuids.length >= oldParentUuids.length) {
         const nextUuidIndex = parentUuids.findIndex((uuid) => !oldParentUuids.includes(uuid));
-        if (nextUuidIndex === -1) return _structureMap.get(firstUuid) || null;
-        result = _structureMap.get(parentUuids[nextUuidIndex]) || null;
+        if (nextUuidIndex === -1) return _structureMap.get(firstUuid);
+        result = _structureMap.get(parentUuids[nextUuidIndex]);
       } else {
         const nextUuidIndex = oldParentUuids.findIndex((uuid) => !parentUuids.includes(uuid));
         if (nextUuidIndex === -1) {
           const lastUuid = parentUuids[parentUuids.length - 1];
-          result = _structureMap.get(lastUuid) || null;
+          result = _structureMap.get(lastUuid);
         } else {
           if (nextUuidIndex === parentUuids.length) {
             const nextUuid = parentUuids[nextUuidIndex - 1];
-            result = _structureMap.get(nextUuid) || null;
+            result = _structureMap.get(nextUuid);
           } else {
             const nextUuid = parentUuids[nextUuidIndex];
-            result = _structureMap.get(nextUuid) || null;
+            result = _structureMap.get(nextUuid);
           }
         }
       }
     } else {
       const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value?.uuid || '') + 1];
       if (!nextUuid) return selectStructure.value;
-      result = _structureMap.get(nextUuid) || null;
+      result = _structureMap.get(nextUuid);
     }
 
     return result;
@@ -176,6 +205,7 @@ export const useStructure = (_id?: string) => {
   };
 
   return {
+    getStyleRef,
     structure: _structure,
     selectStructure,
     hoverStructure,
