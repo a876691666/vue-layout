@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{ id?: string; structure: StructureItem }
 
 provide('structureId', props.id);
 
-const { structure: _structure, setStructure } = useStructure(props.id);
+const { setStructure } = useStructure(props.id);
 
 setStructure(props.structure);
 </script>

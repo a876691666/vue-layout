@@ -14,6 +14,9 @@ export default defineConfig({
       fileName: 'index',
       formats: ['es', 'cjs', 'umd'],
     },
-    rollupOptions: {},
+    rollupOptions: {
+      external: ['vue'],
+      output: { globals: { vue: 'Vue' } },
+    },
   },
 });
