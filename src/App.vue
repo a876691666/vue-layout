@@ -4,31 +4,21 @@ import { LayoutStructure, LayoutStructureProvide, LayoutSelect, LayoutTree, Stru
 const LayoutStructureProps = {
   style: { width: '100%', height: '100%' },
   structure: {
-    type: 'block',
+    type: 'position',
     id: 'root',
     full: true,
     children: [
       {
-        type: 'position',
-        id: 'root-position',
-        children: [
-          {
-            style: { left: '400px', top: '400px' },
-            type: 'position-leaf',
-            children: [
-              {
-                type: 'vue',
-                id: 'component-div',
-                props: { id: '123' },
-                component: 'div',
-                children: [{ type: 'leaf', id: 'logo', style: { width: '250px' } }],
-              },
-            ],
-          },
-          { style: { left: '100px', top: '100px' }, type: 'position-leaf', id: 'menu' },
-          { style: { left: '600px', top: '600px' }, type: 'position-leaf', id: 'footer' },
-        ],
+        type: 'vue',
+        id: 'component-div',
+        props: { id: '123' },
+        style: { left: '400px', top: '400px' },
+        positionLeaf: true,
+        component: 'div',
+        children: [{ type: 'block', id: 'logo', style: { width: '250px' } }],
       },
+      { style: { left: '100px', top: '100px' }, type: 'block', positionLeaf: true, id: 'menu' },
+      { style: { left: '600px', top: '600px' }, type: 'block', positionLeaf: true, id: 'footer' },
     ],
   } as StructureItem,
 };

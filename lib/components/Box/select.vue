@@ -12,8 +12,8 @@
       transform: `translate(${-reoffset.x}px, ${-reoffset.y}px)`,
     }"
   >
-    <div class="control-top" :class="{ 'control-disabled': selectStructure?.type !== 'position-leaf' }"></div>
-    <div class="control-left" :class="{ 'control-disabled': selectStructure?.type !== 'position-leaf' }"></div>
+    <div class="control-top" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
+    <div class="control-left" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
     <div class="control-right" @pointerdown="handleRightStart"></div>
     <div class="control-bottom" @pointerdown="handleBottomStart"></div>
   </div>

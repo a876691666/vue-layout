@@ -8,21 +8,19 @@ const setStructureUuid = (structure: StructureItem, structureMap: Map<string, St
     structure.uuid = v5(JSON.stringify(structure), v5.URL);
   }
   structureMap.set(structure.uuid, structure);
-  if (structure.type !== 'leaf' && structure.children) {
-    structure.children.forEach((child) => {
-      setStructureUuid(child, structureMap);
-    });
-  }
+
+  structure.children?.forEach((child) => {
+    setStructureUuid(child, structureMap);
+  });
 };
 
 // 递归设置parentUuid
 const setParentUuid = (structure: StructureItem, parentUuid?: string) => {
   structure.parentUuid = parentUuid;
-  if (structure.type !== 'leaf' && structure.children) {
-    structure.children.forEach((child) => {
-      setParentUuid(child, structure.uuid);
-    });
-  }
+
+  structure.children?.forEach((child) => {
+    setParentUuid(child, structure.uuid);
+  });
 };
 
 const cacheMap: Record<

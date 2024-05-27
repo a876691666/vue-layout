@@ -10,37 +10,46 @@
     }"
   >
     <template v-if="structure?.type === 'block'">
-      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="slotProps">
-          <slot :name="name" :="slotProps" />
-        </template>
-      </LayoutBox>
-    </template>
-    <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
-      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="slotProps">
-          <slot :name="name" :="slotProps" />
-        </template>
-      </LayoutBox>
-    </template>
-    <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
-      <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="slotProps">
-          <slot :name="name" :="slotProps" />
-        </template>
-      </LayoutBox>
-    </template>
-    <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
-      <component :is="structure.component" :="propsRef">
+      <template v-if="structure.children">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
         </LayoutBox>
-      </component>
+      </template>
+      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
     </template>
-    <template v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
-      <slot :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+    <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
+      <template v-if="structure.children">
+        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" :="slotProps" />
+          </template>
+        </LayoutBox>
+      </template>
+      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+    </template>
+    <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
+      <template v-if="structure.children">
+        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" :="slotProps" />
+          </template>
+        </LayoutBox>
+      </template>
+      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+    </template>
+    <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
+      <component :is="structure.component" :="propsRef">
+        <template v-if="structure.children">
+          <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+            <template v-for="(_, name) in $slots" #[name]="slotProps">
+              <slot :name="name" :="slotProps" />
+            </template>
+          </LayoutBox>
+        </template>
+        <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+      </component>
     </template>
   </LayoutDevBox>
 </template>
@@ -71,7 +80,6 @@ const defineBlockClassName = () => {
   const result: string[] = [];
 
   if (props.structure?.type !== 'block') return result;
-  if (props.structure?.full) result.push('layout-box-block-full');
 
   return result;
 };
@@ -90,6 +98,7 @@ const defineAnyClassName = () => {
   const result: string[] = [];
 
   if (props.structure?.positionLeaf) result.push('layout-box-position-leaf');
+  if (props.structure?.full) result.push('layout-box-full');
 
   return result;
 };
@@ -114,7 +123,7 @@ updateClassName();
 .layout-box-block {
   display: block;
 }
-.layout-box-block-full {
+.layout-box-full {
   width: 100%;
   height: 100%;
 }
