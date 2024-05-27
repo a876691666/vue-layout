@@ -10,7 +10,7 @@
     }"
   >
     <template v-if="structure?.type === 'block'">
-      <template v-if="structure.children">
+      <template v-if="structure.children && structure.children.length">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
@@ -20,7 +20,7 @@
       <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
     </template>
     <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
-      <template v-if="structure.children">
+      <template v-if="structure.children && structure.children.length">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
@@ -30,7 +30,7 @@
       <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
     </template>
     <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
-      <template v-if="structure.children">
+      <template v-if="structure.children && structure.children.length">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
@@ -41,7 +41,7 @@
     </template>
     <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
       <component :is="structure.component" :="propsRef">
-        <template v-if="structure.children">
+        <template v-if="structure.children && structure.children.length">
           <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
             <template v-for="(_, name) in $slots" #[name]="slotProps">
               <slot :name="name" :="slotProps" />
