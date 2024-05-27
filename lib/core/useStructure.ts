@@ -69,11 +69,11 @@ export const useStructure = (_id?: string) => {
     selectParentStructure = cacheMap[id].selectParentStructure;
   }
 
-  const findStructure = (dom: HTMLElement): string | undefined => {
+  const findStructureFromDom = (dom: HTMLElement): string | undefined => {
     if (!dom) return;
 
     const uuid = dom.getAttribute('data-uuid');
-    if (!uuid) return findStructure(dom.parentElement as HTMLElement);
+    if (!uuid) return findStructureFromDom(dom.parentElement as HTMLElement);
 
     return _structureMap.get(uuid) && uuid;
   };
@@ -177,7 +177,7 @@ export const useStructure = (_id?: string) => {
   const getMousePointStructure = (event: MouseEvent): StructureItem | undefined => {
     let result: StructureItem | undefined;
     // 最近的一个包含data-uuid属性的元素
-    const selectUuid = findStructure(event.target as HTMLElement);
+    const selectUuid = findStructureFromDom(event.target as HTMLElement);
     const oldParentUuids = getParentUuids(selectStructure.value?.uuid);
     const parentUuids = getParentUuids(selectUuid);
     selectParentStructure.value = parentUuids;
@@ -308,10 +308,15 @@ export const useStructure = (_id?: string) => {
     }
   };
 
+  const findStructure = (uuid: string) => {
+    return _structureMap.get(uuid);
+  };
+
   return {
     addStructure,
     removeStructure,
     updateStructure,
+    findStructure,
     getStyleRef,
     getPropsRef,
     findUuidFromId,
