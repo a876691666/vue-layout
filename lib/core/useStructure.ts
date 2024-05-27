@@ -1,5 +1,5 @@
 import { Ref, onMounted, onUnmounted, ref, watch } from 'vue';
-import { StructureItem, StyleType } from '../types';
+import { StructureItem, StyleType, VueStructureItem } from '../types';
 import { v5 } from 'uuid';
 
 // 递归设置结构的uuid
@@ -283,6 +283,9 @@ export const useStructure = (_id?: string) => {
 
     if (structure.label) {
       oldStructure.label = structure.label;
+    }
+    if (structure.type === 'vue' && structure.component) {
+      (oldStructure as VueStructureItem).component = structure.component;
     }
     if (structure.userData) {
       oldStructure.userData = structure.userData;
