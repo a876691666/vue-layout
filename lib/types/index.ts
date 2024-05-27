@@ -14,6 +14,7 @@ export type BaseStructureItem = {
   uuid?: string;
   parentUuid?: string;
   style?: StyleType;
+  props?: Record<string, any>;
   children?: StructureItem[];
 };
 

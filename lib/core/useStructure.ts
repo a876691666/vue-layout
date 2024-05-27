@@ -31,6 +31,7 @@ const cacheMap: Record<
     structure: Ref<StructureItem | undefined>;
     structureMap: Map<string, StructureItem>;
     structureStyleMap: Map<string, Ref<StyleType>>;
+    structurePropsMap: Map<string, any>;
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
     selectParentStructure: Ref<string[]>;
@@ -43,6 +44,7 @@ export const useStructure = (_id?: string) => {
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let _structureMap = new Map<string, StructureItem>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();
+  let _structurePropsMap = new Map<string, any>();
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
@@ -54,6 +56,7 @@ export const useStructure = (_id?: string) => {
       structure: _structure,
       structureMap: _structureMap,
       structureStyleMap: _structureStyleMap,
+      structurePropsMap: _structurePropsMap,
       selectStructure: selectStructure,
       hoverStructure: hoverStructure,
       selectParentStructure: selectParentStructure,
@@ -62,6 +65,7 @@ export const useStructure = (_id?: string) => {
     _structure = cacheMap[id].structure;
     _structureMap = cacheMap[id].structureMap;
     _structureStyleMap = cacheMap[id].structureStyleMap;
+    _structurePropsMap = cacheMap[id].structurePropsMap;
     selectStructure = cacheMap[id].selectStructure;
     hoverStructure = cacheMap[id].hoverStructure;
     selectParentStructure = cacheMap[id].selectParentStructure;
@@ -97,6 +101,17 @@ export const useStructure = (_id?: string) => {
     return styleRef;
   };
 
+  const createPropsRef = (uuid: string) => {
+    const propsRef = ref(_structureMap.get(uuid)?.props || {});
+
+    watch(propsRef, (props) => {
+      if (!_structureMap.get(uuid)) return;
+      _structureMap.get(uuid)!.props = props;
+    });
+
+    return propsRef;
+  };
+
   const setStructure = (structure?: StructureItem) => {
     if (!structure) return;
 
@@ -107,6 +122,7 @@ export const useStructure = (_id?: string) => {
 
     _structureMap.forEach((_value, key) => {
       _structureStyleMap.set(key, createStyleRef(key));
+      _structurePropsMap.set(key, createPropsRef(key));
     });
   };
 
@@ -118,6 +134,16 @@ export const useStructure = (_id?: string) => {
       _structureStyleMap.set(uuid, styleRef);
     }
     return styleRef;
+  };
+
+  const getPropsRef = (uuid?: string) => {
+    if (!uuid) return;
+    let propsRef = _structurePropsMap.get(uuid);
+    if (!propsRef) {
+      propsRef = createPropsRef(uuid);
+      _structurePropsMap.set(uuid, propsRef);
+    }
+    return propsRef;
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -206,6 +232,7 @@ export const useStructure = (_id?: string) => {
 
   return {
     getStyleRef,
+    getPropsRef,
     structure: _structure,
     selectStructure,
     hoverStructure,
