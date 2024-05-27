@@ -7,6 +7,7 @@ const LayoutStructureProps = {
     type: 'position',
     id: 'root',
     full: true,
+    ignore: true,
     children: [
       {
         type: 'vue',

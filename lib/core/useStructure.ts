@@ -85,6 +85,8 @@ export const useStructure = (_id?: string) => {
     const structure = _structureMap.get(uuid);
     if (!structure) return [];
 
+    if (structure.ignore) return getParentUuids(structure.parentUuid);
+
     return [...getParentUuids(structure.parentUuid), uuid];
   };
 

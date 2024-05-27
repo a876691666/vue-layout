@@ -19,6 +19,8 @@ export type BaseStructureItem = {
 
   positionLeaf?: boolean;
   full?: boolean;
+
+  ignore?: boolean;
 };
 
 export type PositionStructureItem = {
