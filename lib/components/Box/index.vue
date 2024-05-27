@@ -11,46 +11,52 @@
   >
     <template v-if="structure?.type === 'block'">
       <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="{ structure, styleRef }">
-          <slot :name="name" :structure="structure" :styleRef="styleRef" />
+        <template v-for="(_, name) in $slots" #[name]="slotProps">
+          <slot :name="name" :="slotProps" />
         </template>
       </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
       <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="{ structure, styleRef }">
-          <slot :name="name" :structure="structure" :styleRef="styleRef" />
+        <template v-for="(_, name) in $slots" #[name]="slotProps">
+          <slot :name="name" :="slotProps" />
         </template>
       </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
       <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-        <template v-for="(_, name) in $slots" #[name]="{ structure, styleRef }">
-          <slot :name="name" :structure="structure" :styleRef="styleRef" />
+        <template v-for="(_, name) in $slots" #[name]="slotProps">
+          <slot :name="name" :="slotProps" />
         </template>
       </LayoutBox>
     </template>
     <template v-else-if="structure?.type === 'position-leaf'" class="relative" :data-id="structure.id">
       <template v-if="structure.children">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-          <template v-for="(_, name) in $slots" #[name]="{ structure, styleRef }">
-            <slot :name="name" :structure="structure" :styleRef="styleRef" />
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" :="slotProps" />
           </template>
         </LayoutBox>
       </template>
-      <slot :name="structure.id" v-else-if="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" />
+      <slot
+        :name="structure.id"
+        v-else-if="structure.id"
+        :structure="structure"
+        :styleRef="getCurrentStyleRef()"
+        :propsRef="getCurrentPropsRef()"
+      />
     </template>
     <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
-      <component :is="structure.component">
+      <component :is="structure.component" :="propsRef">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-          <template v-for="(_, name) in $slots" #[name]="{ structure, styleRef }">
-            <slot :name="name" :structure="structure" :styleRef="styleRef" />
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" :="slotProps" />
           </template>
         </LayoutBox>
       </component>
     </template>
     <template v-else-if="structure?.type === 'leaf'" :style="structure.style" :data-id="structure.id">
-      <slot :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" />
+      <slot :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
     </template>
   </LayoutDevBox>
 </template>
@@ -63,11 +69,15 @@ import { useStructure } from '../../core/useStructure';
 
 const props = withDefaults(defineProps<{ style?: StyleType; structure?: StructureItem }>(), { style: () => ({}) });
 defineOptions({ name: 'LayoutBox' });
-defineSlots<{ [key: string]: (props: { structure: StructureItem; styleRef?: Ref<StyleType> }) => any }>();
+defineSlots<{
+  [key: string]: (props: { structure: StructureItem; styleRef?: Ref<StyleType>; propsRef?: Ref<{ [key: string]: any }> }) => any;
+}>();
 
-const { getStyleRef } = useStructure(inject('structureId'));
+const { getStyleRef, getPropsRef } = useStructure(inject('structureId'));
 const styleRef = getStyleRef(props.structure?.uuid);
+const propsRef = getPropsRef(props.structure?.uuid);
 const getCurrentStyleRef = () => styleRef;
+const getCurrentPropsRef = () => propsRef;
 
 const layoutType = ref(props.structure?.type);
 

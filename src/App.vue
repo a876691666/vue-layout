@@ -15,7 +15,15 @@ const LayoutStructureProps = {
           {
             style: { left: '400px', top: '400px' },
             type: 'position-leaf',
-            children: [{ type: 'vue', component: 'div', children: [{ type: 'leaf', id: 'logo', style: { width: '250px' } }] }],
+            children: [
+              {
+                type: 'vue',
+                id: 'component-div',
+                props: { id: '123' },
+                component: 'div',
+                children: [{ type: 'leaf', id: 'logo', style: { width: '250px' } }],
+              },
+            ],
           },
           { style: { left: '100px', top: '100px' }, type: 'position-leaf', id: 'menu' },
           { style: { left: '600px', top: '600px' }, type: 'position-leaf', id: 'footer' },

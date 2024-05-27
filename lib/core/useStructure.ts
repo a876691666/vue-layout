@@ -44,7 +44,7 @@ export const useStructure = (_id?: string) => {
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let _structureMap = new Map<string, StructureItem>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();
-  let _structurePropsMap = new Map<string, any>();
+  let _structurePropsMap = new Map<string, Ref<{ [key: string]: any }>>();
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
@@ -230,9 +230,91 @@ export const useStructure = (_id?: string) => {
     hoverStructure.value = structure;
   };
 
+  const findUuidFromId = (id: string) => {
+    let result: string | undefined;
+    _structureMap.forEach((value) => {
+      if (value.id === id) {
+        result = value.uuid;
+      }
+    });
+    return result;
+  };
+
+  const addStructure = (structure: StructureItem, parentUuid: string) => {
+    if (!structure.uuid) {
+      structure.uuid = v5(JSON.stringify(structure), v5.URL);
+    }
+
+    if (!_structureMap.has(structure.uuid)) _structureMap.set(structure.uuid, structure);
+    if (!_structureStyleMap.has(structure.uuid)) _structureStyleMap.set(structure.uuid, createStyleRef(structure.uuid));
+    if (!_structurePropsMap.has(structure.uuid)) _structurePropsMap.set(structure.uuid, createPropsRef(structure.uuid));
+
+    if (parentUuid) {
+      structure.parentUuid = parentUuid;
+      const parent = _structureMap.get(parentUuid);
+      if (parent) {
+        if (!parent.children) parent.children = [];
+        parent.children.push(structure);
+      }
+    }
+
+    return structure;
+  };
+
+  const removeStructure = (uuid: string) => {
+    const structure = _structureMap.get(uuid);
+    if (!structure) return;
+
+    if (structure.parentUuid) {
+      const parent = _structureMap.get(structure.parentUuid);
+      if (parent) {
+        parent.children = parent.children?.filter((child) => child.uuid !== uuid);
+      }
+    }
+
+    _structureMap.delete(uuid);
+    _structureStyleMap.delete(uuid);
+    _structurePropsMap.delete(uuid);
+  };
+
+  const updateStructure = (uuid: string, structure: StructureItem) => {
+    const oldStructure = _structureMap.get(uuid);
+    if (!oldStructure) return;
+
+    if (structure.label) {
+      oldStructure.label = structure.label;
+    }
+    if (structure.userData) {
+      oldStructure.userData = structure.userData;
+    }
+    if (structure.id) {
+      oldStructure.id = structure.id;
+    }
+    if (structure.type) {
+      oldStructure.type = structure.type;
+    }
+    if (structure.style) {
+      if (!_structureStyleMap.has(uuid)) _structureStyleMap.set(uuid, createStyleRef(uuid));
+      const styleRef = _structureStyleMap.get(uuid);
+      if (styleRef) styleRef.value = structure.style;
+    }
+    if (structure.props) {
+      if (!_structurePropsMap.has(uuid)) _structurePropsMap.set(uuid, createPropsRef(uuid));
+      const propsRef = _structurePropsMap.get(uuid);
+      if (propsRef) propsRef.value = structure.props;
+    }
+    if (structure.children) {
+      oldStructure.children = structure.children;
+    }
+  };
+
   return {
+    addStructure,
+    removeStructure,
+    updateStructure,
     getStyleRef,
     getPropsRef,
+    findUuidFromId,
     structure: _structure,
     selectStructure,
     hoverStructure,
