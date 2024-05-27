@@ -16,6 +16,7 @@ export type BaseStructureItem = {
   style?: StyleType;
   props?: Record<string, any>;
   children?: StructureItem[];
+  positionLeaf?: boolean;
 };
 
 export type LeafStructureItem = {
@@ -24,11 +25,6 @@ export type LeafStructureItem = {
 
 export type PositionStructureItem = {
   type: 'position';
-  children?: PositionLeafStructureItem[];
-} & BaseStructureItem;
-
-export type PositionLeafStructureItem = {
-  type: 'position-leaf';
 } & BaseStructureItem;
 
 export type BlockStructureItem = {
@@ -46,10 +42,4 @@ export type FlexStructureItem = {
   direction?: 'row' | 'column';
 } & BaseStructureItem;
 
-export type StructureItem =
-  | LeafStructureItem
-  | BlockStructureItem
-  | FlexStructureItem
-  | PositionStructureItem
-  | PositionLeafStructureItem
-  | VueStructureItem;
+export type StructureItem = LeafStructureItem | BlockStructureItem | FlexStructureItem | PositionStructureItem | VueStructureItem;

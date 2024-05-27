@@ -30,22 +30,6 @@
         </template>
       </LayoutBox>
     </template>
-    <template v-else-if="structure?.type === 'position-leaf'" class="relative" :data-id="structure.id">
-      <template v-if="structure.children">
-        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
-          <template v-for="(_, name) in $slots" #[name]="slotProps">
-            <slot :name="name" :="slotProps" />
-          </template>
-        </LayoutBox>
-      </template>
-      <slot
-        :name="structure.id"
-        v-else-if="structure.id"
-        :structure="structure"
-        :styleRef="getCurrentStyleRef()"
-        :propsRef="getCurrentPropsRef()"
-      />
-    </template>
     <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
       <component :is="structure.component" :="propsRef">
         <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
@@ -102,11 +86,21 @@ const defineFlexClassName = () => {
   return result;
 };
 
+const defineAnyClassName = () => {
+  const result: string[] = [];
+
+  if (props.structure?.positionLeaf) result.push('layout-box-position-leaf');
+
+  return result;
+};
+
 const updateClassName = () => {
   const newClass = [`layout-box-${layoutType.value}`];
 
   if (layoutType.value === 'block') newClass.push(...defineBlockClassName());
   if (layoutType.value === 'flex') newClass.push(...defineFlexClassName());
+
+  newClass.push(...defineAnyClassName());
 
   className.value = newClass;
 };
