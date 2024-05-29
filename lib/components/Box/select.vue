@@ -17,32 +17,31 @@
     <div class="control-left" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
     <div class="control-right" @pointerdown="handleRightStart"></div>
     <div class="control-bottom" @pointerdown="handleBottomStart"></div>
+    <div class="control-move" v-if="selectStructure.positionLeaf" @pointerdown="handleMoveStart"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { inject, onMounted, ref, watch } from 'vue';
+import { inject, onMounted, ref, watch, nextTick } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure } = useStructure(inject('structureId'));
+const { selectStructure, getStyleRef } = useStructure(inject('structureId'));
 
 const rect = ref<DOMRect | null>(null);
 
-const realSize = ref({ width: 0, height: 0 });
+const realSize = ref({ width: 0, height: 0, x: 0, y: 0 });
 const sizeScale = ref({ x: 1, y: 1 });
 const reoffset = ref({ x: 0, y: 0 });
 
 const handleBottomStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
+  const styleRef = getStyleRef(selectStructure.value.uuid)!;
   updateRect();
   const startY = e.clientY;
-  const startHeight = rect.value?.height;
+  const startHeight = rect.value?.height || 0;
   const handleMove = (e: PointerEvent) => {
-    if (!startHeight) return;
     rect.value = { ...rect.value!, height: startHeight + e.clientY - startY };
-    if (selectStructure.value) {
-      if (!selectStructure.value.style) selectStructure.value.style = {};
-      selectStructure.value.style.height = `${rect.value.height / sizeScale.value.y}px`;
-    }
+    if (!selectStructure.value) return;
+    styleRef.value.height = `${rect.value.height / sizeScale.value.y}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);
@@ -54,16 +53,38 @@ const handleBottomStart = (e: PointerEvent) => {
 
 const handleRightStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
+  const styleRef = getStyleRef(selectStructure.value.uuid)!;
   updateRect();
   const startX = e.clientX;
-  const startWidth = rect.value?.width;
+  const startWidth = rect.value?.width || 0;
   const handleMove = (e: PointerEvent) => {
-    if (!startWidth) return;
     rect.value = { ...rect.value!, width: startWidth + e.clientX - startX };
-    if (selectStructure.value) {
-      if (!selectStructure.value.style) selectStructure.value.style = {};
-      selectStructure.value.style.width = `${rect.value.width / sizeScale.value.x}px`;
-    }
+    if (!selectStructure.value) return;
+    styleRef.value.width = `${rect.value.width / sizeScale.value.x}px`;
+  };
+  const handleEnd = () => {
+    window.removeEventListener('pointermove', handleMove);
+    window.removeEventListener('pointerup', handleEnd);
+  };
+  window.addEventListener('pointermove', handleMove);
+  window.addEventListener('pointerup', handleEnd);
+};
+
+const handleMoveStart = (e: PointerEvent) => {
+  if (!selectStructure.value) return;
+  const styleRef = getStyleRef(selectStructure.value.uuid)!;
+  updateRect();
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const startLeft = parseInt(styleRef.value.left || '0');
+  const startTop = parseInt(styleRef.value.top || '0');
+  const startRectLeft = rect.value?.left || 0;
+  const startRectTop = rect.value?.top || 0;
+  const handleMove = (e: PointerEvent) => {
+    rect.value = { ...rect.value!, left: startRectLeft + (e.clientX - startX), top: startRectTop + (e.clientY - startY) };
+    if (!selectStructure.value) return;
+    styleRef.value.left = `${startLeft + (e.clientX - startX) / sizeScale.value.x}px`;
+    styleRef.value.top = `${startTop + (e.clientY - startY) / sizeScale.value.y}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);
@@ -81,12 +102,14 @@ const updateRect = () => {
   if (!dom) return;
   updateOffset();
   rect.value = dom.getBoundingClientRect();
-  realSize.value = { width: dom.clientWidth, height: dom.clientHeight };
+  realSize.value = { width: dom.clientWidth, height: dom.clientHeight, x: dom.clientLeft, y: dom.clientTop };
   sizeScale.value = { x: rect.value.width / realSize.value.width, y: rect.value.height / realSize.value.height };
 };
 
 watch(selectStructure, () => {
-  updateRect();
+  nextTick(() => {
+    updateRect();
+  });
 });
 
 const updateOffset = () => {
@@ -98,6 +121,15 @@ const updateOffset = () => {
 
 onMounted(() => {
   updateOffset();
+
+  // 检测所有父级的滚动事件
+  let parent = domRef.value?.parentElement;
+  while (parent) {
+    parent.addEventListener('scroll', updateOffset);
+    parent = parent.parentElement;
+  }
+
+  window.addEventListener('resize', updateRect);
 });
 </script>
 <style scoped lang="less">
@@ -180,6 +212,25 @@ onMounted(() => {
     background-color: red;
   }
 }
+
+.control-move {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: all;
+  cursor: move;
+
+  background: rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
 .control-disabled {
   opacity: 0.8;
   cursor: not-allowed;
