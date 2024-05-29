@@ -24,7 +24,7 @@ const LayoutStructureProps = {
   } as StructureItem,
 };
 
-const { selectStructure } = useStructure('main');
+const { selectStructure } = useStructure();
 </script>
 
 <template>

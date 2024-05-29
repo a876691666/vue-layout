@@ -18,12 +18,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
 const props = withDefaults(defineProps<{ dev?: boolean; props: any }>(), { dev: false });
 
-const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure } = useStructure(inject('structureId'));
+const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure } = useStructure();
 </script>
 <style scoped>
 .layout-box-dev-selected {

@@ -10,7 +10,7 @@
 import { StructureItem, StyleType } from '../../types';
 import { LayoutBox } from '../Box';
 import { useStructure } from '../../core/useStructure';
-import { Ref, inject } from 'vue';
+import { Ref } from 'vue';
 
 defineSlots<{
   [key: string]: (props: { structure: StructureItem; styleRef?: Ref<StyleType>; propsRef?: Ref<{ [key: string]: any }> }) => any;
@@ -18,5 +18,5 @@ defineSlots<{
 
 withDefaults(defineProps<{ style?: StyleType }>(), { style: () => ({ width: '1920px', height: '1080px' }) });
 
-const { structure } = useStructure(inject('structureId'));
+const { structure } = useStructure();
 </script>

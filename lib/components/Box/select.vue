@@ -21,10 +21,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject, onMounted, ref, watch, nextTick, onUnmounted, computed } from 'vue';
+import { onMounted, ref, watch, nextTick, onUnmounted, computed } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure, getStyleRef, isCtrl } = useStructure(inject('structureId'));
+const { selectStructure, getStyleRef, isCtrl, event } = useStructure();
 
 const styleRef = computed(() => getStyleRef(selectStructure.value?.uuid)?.value);
 watch(selectStructure, () => nextTick(() => updateRect()));
@@ -124,6 +124,8 @@ onMounted(() => {
   }
 
   window.addEventListener('resize', updateRect);
+
+  event.on('updateSelectRect', updateRect);
 });
 
 onUnmounted(() => {
@@ -134,6 +136,8 @@ onUnmounted(() => {
   }
 
   window.removeEventListener('resize', updateRect);
+
+  event.off('updateSelectRect', updateRect);
 });
 </script>
 <style scoped lang="less">

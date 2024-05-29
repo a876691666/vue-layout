@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, inject, ref } from 'vue';
+import { Ref, ref } from 'vue';
 import { StructureItem, StyleType } from '../../types';
 import { LayoutDevBox } from '.';
 import { useStructure } from '../../core/useStructure';
@@ -66,7 +66,7 @@ defineSlots<{
   [key: string]: (props: { structure: StructureItem; styleRef?: Ref<StyleType>; propsRef?: Ref<{ [key: string]: any }> }) => any;
 }>();
 
-const { getStyleRef, getPropsRef } = useStructure(inject('structureId'));
+const { getStyleRef, getPropsRef } = useStructure();
 const styleRef = getStyleRef(props.structure?.uuid);
 const propsRef = getPropsRef(props.structure?.uuid);
 const getCurrentStyleRef = () => styleRef;

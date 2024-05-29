@@ -25,7 +25,6 @@
 <script setup lang="ts">
 import { StructureItem } from '../../types';
 import { useStructure } from '../../core/useStructure';
-import { inject } from 'vue';
 
 defineOptions({ name: 'LayoutTreeItem' });
 
@@ -33,7 +32,7 @@ defineSlots<{ default(props: { structure: StructureItem; isSelect: boolean; isHo
 
 withDefaults(defineProps<{ structure?: StructureItem }>(), {});
 
-const { selectStructure, hoverStructure } = useStructure(inject('structureId'));
+const { selectStructure, hoverStructure } = useStructure();
 </script>
 <style scoped>
 .layout-tree-item {

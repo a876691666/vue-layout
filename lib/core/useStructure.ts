@@ -1,6 +1,7 @@
-import { Ref, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Ref, inject, onMounted, onUnmounted, ref, watch } from 'vue';
 import { StructureItem, StyleType, VueStructureItem } from '../types';
 import { v5 } from 'uuid';
+import mitt, { Emitter } from 'mitt';
 
 // 递归设置结构的uuid
 const setStructureUuid = (structure: StructureItem, structureMap: Map<string, StructureItem>) => {
@@ -33,6 +34,7 @@ const cacheMap: Record<
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
     selectParentStructure: Ref<string[]>;
+    event: Emitter<{ updateSelectRect: void }>;
   }
 > = {};
 
@@ -47,8 +49,9 @@ export const useStructure = (_id?: string) => {
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
+  let event = mitt<{ updateSelectRect: void }>();
 
-  const id = _id || 'default';
+  const id = _id || inject<string>('structureId') || 'default';
 
   if (!cacheMap[id]) {
     cacheMap[id] = {
@@ -59,6 +62,7 @@ export const useStructure = (_id?: string) => {
       selectStructure: selectStructure,
       hoverStructure: hoverStructure,
       selectParentStructure: selectParentStructure,
+      event,
     };
   } else {
     _structure = cacheMap[id].structure;
@@ -68,6 +72,7 @@ export const useStructure = (_id?: string) => {
     selectStructure = cacheMap[id].selectStructure;
     hoverStructure = cacheMap[id].hoverStructure;
     selectParentStructure = cacheMap[id].selectParentStructure;
+    event = cacheMap[id].event;
   }
 
   const findStructureFromDom = (dom: HTMLElement): string | undefined => {
@@ -317,6 +322,7 @@ export const useStructure = (_id?: string) => {
   return {
     isAlt,
     isCtrl,
+    event,
     addStructure,
     removeStructure,
     updateStructure,

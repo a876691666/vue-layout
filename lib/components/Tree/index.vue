@@ -14,11 +14,10 @@
 import { StructureItem } from '../../types';
 import { useStructure } from '../../core/useStructure';
 import LayoutTreeItem from './item.vue';
-import { inject } from 'vue';
 
 defineOptions({ name: 'LayoutTree' });
 
 defineSlots<{ item(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any }>();
 
-const { structure } = useStructure(inject('structureId'));
+const { structure } = useStructure();
 </script>
