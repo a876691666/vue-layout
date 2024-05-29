@@ -2,6 +2,7 @@
   <div
     class="layout-box-selected"
     ref="domRef"
+    v-if="selectStructure"
     :style="{
       position: 'absolute',
       left: rect?.left + 'px',
