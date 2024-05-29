@@ -37,6 +37,7 @@ const cacheMap: Record<
 > = {};
 
 const isAlt = ref(false);
+const isCtrl = ref(false);
 
 export const useStructure = (_id?: string) => {
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
@@ -147,26 +148,24 @@ export const useStructure = (_id?: string) => {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Alt') {
-      isAlt.value = true;
-    }
-    if (event.key === 'Meta') {
-      isAlt.value = true;
-    }
+    if (event.key === 'Alt') isAlt.value = true;
+    if (event.key === 'Meta') isAlt.value = true;
+    if (event.key === 'Control') isCtrl.value = true;
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    if (event.key === 'Alt') {
-      isAlt.value = false;
-    }
-    if (event.key === 'Meta') {
-      isAlt.value = false;
-    }
+    if (event.key === 'Alt') isAlt.value = false;
+    if (event.key === 'Meta') isAlt.value = false;
+    if (event.key === 'Control') isCtrl.value = false;
   };
 
   onMounted(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', () => {
+      isAlt.value = false;
+      isCtrl.value = false;
+    });
   });
 
   onUnmounted(() => {
@@ -316,6 +315,8 @@ export const useStructure = (_id?: string) => {
   };
 
   return {
+    isAlt,
+    isCtrl,
     addStructure,
     removeStructure,
     updateStructure,

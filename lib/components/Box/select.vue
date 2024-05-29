@@ -17,14 +17,14 @@
     <div class="control-left" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
     <div class="control-right" @pointerdown="handleRightStart"></div>
     <div class="control-bottom" @pointerdown="handleBottomStart"></div>
-    <div class="control-move" v-if="selectStructure.positionLeaf" @pointerdown="handleMoveStart"></div>
+    <div class="control-move" v-if="selectStructure.positionLeaf && isCtrl" @pointerdown="handleMoveStart"></div>
   </div>
 </template>
 <script setup lang="ts">
-import { inject, onMounted, ref, watch, nextTick } from 'vue';
+import { inject, onMounted, ref, watch, nextTick, onUnmounted } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure, getStyleRef } = useStructure(inject('structureId'));
+const { selectStructure, getStyleRef, isCtrl } = useStructure(inject('structureId'));
 
 const rect = ref<DOMRect | null>(null);
 
@@ -130,6 +130,16 @@ onMounted(() => {
   }
 
   window.addEventListener('resize', updateRect);
+});
+
+onUnmounted(() => {
+  let parent = domRef.value?.parentElement;
+  while (parent) {
+    parent.removeEventListener('scroll', updateOffset);
+    parent = parent.parentElement;
+  }
+
+  window.removeEventListener('resize', updateRect);
 });
 </script>
 <style scoped lang="less">
