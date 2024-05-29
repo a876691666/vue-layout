@@ -21,10 +21,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject, onMounted, ref, watch, nextTick, onUnmounted } from 'vue';
+import { inject, onMounted, ref, watch, nextTick, onUnmounted, computed } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
 const { selectStructure, getStyleRef, isCtrl } = useStructure(inject('structureId'));
+
+const styleRef = computed(() => getStyleRef(selectStructure.value?.uuid)?.value);
+watch(selectStructure, () => nextTick(() => updateRect()));
+watch(styleRef, () => updateRect(), { deep: true });
 
 const rect = ref<DOMRect | null>(null);
 
@@ -34,14 +38,13 @@ const reoffset = ref({ x: 0, y: 0 });
 
 const handleBottomStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
-  const styleRef = getStyleRef(selectStructure.value.uuid)!;
   updateRect();
   const startY = e.clientY;
   const startHeight = rect.value?.height || 0;
   const handleMove = (e: PointerEvent) => {
-    rect.value = { ...rect.value!, height: startHeight + e.clientY - startY };
-    if (!selectStructure.value) return;
-    styleRef.value.height = `${rect.value.height / sizeScale.value.y}px`;
+    if (!selectStructure.value || !styleRef.value) return;
+    const moveLength = startHeight + e.clientY - startY;
+    styleRef.value.height = `${moveLength / sizeScale.value.y}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);
@@ -53,14 +56,13 @@ const handleBottomStart = (e: PointerEvent) => {
 
 const handleRightStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;
-  const styleRef = getStyleRef(selectStructure.value.uuid)!;
   updateRect();
   const startX = e.clientX;
   const startWidth = rect.value?.width || 0;
   const handleMove = (e: PointerEvent) => {
-    rect.value = { ...rect.value!, width: startWidth + e.clientX - startX };
-    if (!selectStructure.value) return;
-    styleRef.value.width = `${rect.value.width / sizeScale.value.x}px`;
+    if (!selectStructure.value || !styleRef.value) return;
+    const moveLength = startWidth + e.clientX - startX;
+    styleRef.value.width = `${moveLength / sizeScale.value.x}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);
@@ -71,20 +73,18 @@ const handleRightStart = (e: PointerEvent) => {
 };
 
 const handleMoveStart = (e: PointerEvent) => {
-  if (!selectStructure.value) return;
-  const styleRef = getStyleRef(selectStructure.value.uuid)!;
+  if (!selectStructure.value || !styleRef.value) return;
   updateRect();
   const startX = e.clientX;
   const startY = e.clientY;
   const startLeft = parseInt(styleRef.value.left || '0');
   const startTop = parseInt(styleRef.value.top || '0');
-  const startRectLeft = rect.value?.left || 0;
-  const startRectTop = rect.value?.top || 0;
   const handleMove = (e: PointerEvent) => {
-    rect.value = { ...rect.value!, left: startRectLeft + (e.clientX - startX), top: startRectTop + (e.clientY - startY) };
-    if (!selectStructure.value) return;
-    styleRef.value.left = `${startLeft + (e.clientX - startX) / sizeScale.value.x}px`;
-    styleRef.value.top = `${startTop + (e.clientY - startY) / sizeScale.value.y}px`;
+    if (!selectStructure.value || !styleRef.value) return;
+    const moveLeft = startLeft + (e.clientX - startX) / sizeScale.value.x;
+    const moveTop = startTop + (e.clientY - startY) / sizeScale.value.y;
+    styleRef.value.left = `${moveLeft}px`;
+    styleRef.value.top = `${moveTop}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);
@@ -105,12 +105,6 @@ const updateRect = () => {
   realSize.value = { width: dom.clientWidth, height: dom.clientHeight, x: dom.clientLeft, y: dom.clientTop };
   sizeScale.value = { x: rect.value.width / realSize.value.width, y: rect.value.height / realSize.value.height };
 };
-
-watch(selectStructure, () => {
-  nextTick(() => {
-    updateRect();
-  });
-});
 
 const updateOffset = () => {
   if (!domRef.value) return;
