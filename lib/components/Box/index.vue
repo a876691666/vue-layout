@@ -8,6 +8,7 @@
       'data-id': structure?.id,
       'data-type': structure?.type,
     }"
+    v-show="!structure?.hidden"
   >
     <template v-if="structure?.type === 'block'">
       <template v-if="structure.children && structure.children.length">
@@ -99,6 +100,8 @@ const defineAnyClassName = () => {
 
   if (props.structure?.positionLeaf) result.push('layout-box-position-leaf');
   if (props.structure?.full) result.push('layout-box-full');
+  if (props.structure?.fullw) result.push('layout-box-fullw');
+  if (props.structure?.fullh) result.push('layout-box-fullh');
 
   return result;
 };
@@ -127,6 +130,12 @@ updateClassName();
   width: 100%;
   height: 100%;
 }
+.layout-box-fullw {
+  width: 100%;
+}
+.layout-box-fullh {
+  height: 100%;
+}
 .layout-box-flex {
   display: flex;
 }
@@ -143,7 +152,5 @@ updateClassName();
 }
 .layout-box-position-leaf {
   position: absolute;
-}
-.layout-box-leaf {
 }
 </style>

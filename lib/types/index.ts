@@ -17,10 +17,35 @@ export type BaseStructureItem = {
   props?: Record<string, any>;
   children?: StructureItem[];
 
+  /**
+   * 是否是叶子节点
+   */
   positionLeaf?: boolean;
+
+  /**
+   * 是否占满父容器
+   */
   full?: boolean;
 
+  /**
+   * 交互时忽略
+   */
   ignore?: boolean;
+
+  /**
+   * 是否隐藏
+   */
+  hidden?: boolean;
+
+  /**
+   * 是否横向占满
+   */
+  fullw?: boolean;
+
+  /**
+   * 是否纵向占满
+   */
+  fullh?: boolean;
 };
 
 export type PositionStructureItem = {
