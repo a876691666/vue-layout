@@ -62,7 +62,7 @@
       />
     </template>
     <template v-else-if="structureAgent?.type === 'vue'" :data-id="structureAgent.id">
-      <component :is="structureAgent.component" :="{ ...propsRef, ...globalPropsRef }">
+      <component :is="structureAgent.component" :="{ ...propsRef, ...(structure?.noGlobalProps ? {} : globalPropsRef) }">
         <template v-if="structureAgent.children && structureAgent.children.length">
           <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
             <template v-for="(_, name) in $slots" #[name]="slotProps">

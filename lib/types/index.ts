@@ -1,3 +1,5 @@
+import { CSSProperties } from 'vue';
+
 export type StyleType = {
   left?: string;
   top?: string;
@@ -5,7 +7,7 @@ export type StyleType = {
   bottom?: string;
   width?: string;
   height?: string;
-};
+} & CSSProperties;
 
 export type BaseStructureItem = {
   label?: string;
@@ -46,6 +48,11 @@ export type BaseStructureItem = {
    * 是否纵向占满
    */
   fullh?: boolean;
+
+  /**
+   * 是否使用全局属性
+   */
+  noGlobalProps?: boolean;
 };
 
 export type PositionStructureItem = {
