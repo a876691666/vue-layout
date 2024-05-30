@@ -18,7 +18,14 @@
           </template>
         </LayoutBox>
       </template>
-      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+      <slot
+        v-else
+        :name="structure.id"
+        :structure="structure"
+        :styleRef="getCurrentStyleRef()"
+        :propsRef="getCurrentPropsRef()"
+        :globalPropsRef="getGlobalPropsRef()"
+      />
     </template>
     <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
       <template v-if="structure.children && structure.children.length">
@@ -28,7 +35,14 @@
           </template>
         </LayoutBox>
       </template>
-      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+      <slot
+        v-else
+        :name="structure.id"
+        :structure="structure"
+        :styleRef="getCurrentStyleRef()"
+        :propsRef="getCurrentPropsRef()"
+        :globalPropsRef="getGlobalPropsRef()"
+      />
     </template>
     <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
       <template v-if="structure.children && structure.children.length">
@@ -38,10 +52,17 @@
           </template>
         </LayoutBox>
       </template>
-      <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+      <slot
+        v-else
+        :name="structure.id"
+        :structure="structure"
+        :styleRef="getCurrentStyleRef()"
+        :propsRef="getCurrentPropsRef()"
+        :globalPropsRef="getGlobalPropsRef()"
+      />
     </template>
     <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
-      <component :is="structure.component" :="propsRef">
+      <component :is="structure.component" :="{ ...propsRef, ...globalPropsRef }">
         <template v-if="structure.children && structure.children.length">
           <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
             <template v-for="(_, name) in $slots" #[name]="slotProps">
@@ -49,7 +70,14 @@
             </template>
           </LayoutBox>
         </template>
-        <slot v-else :name="structure.id" :structure="structure" :styleRef="getCurrentStyleRef()" :propsRef="getCurrentPropsRef()" />
+        <slot
+          v-else
+          :name="structure.id"
+          :structure="structure"
+          :styleRef="getCurrentStyleRef()"
+          :propsRef="getCurrentPropsRef()"
+          :globalPropsRef="getGlobalPropsRef()"
+        />
       </component>
     </template>
   </LayoutDevBox>
@@ -64,12 +92,18 @@ import { useStructure } from '../../core/useStructure';
 const props = withDefaults(defineProps<{ style?: StyleType; structure?: StructureItem }>(), { style: () => ({}) });
 defineOptions({ name: 'LayoutBox' });
 defineSlots<{
-  [key: string]: (props: { structure: StructureItem; styleRef?: Ref<StyleType>; propsRef?: Ref<{ [key: string]: any }> }) => any;
+  [key: string]: (props: {
+    structure: StructureItem;
+    styleRef?: Ref<StyleType>;
+    propsRef?: Ref<{ [key: string]: any }>;
+    globalPropsRef?: Ref<{ [key: string]: any }>;
+  }) => any;
 }>();
 
-const { getStyleRef, getPropsRef } = useStructure();
+const { getStyleRef, getPropsRef, getGlobalPropsRef } = useStructure();
 const styleRef = getStyleRef(props.structure?.uuid);
 const propsRef = getPropsRef(props.structure?.uuid);
+const globalPropsRef = getGlobalPropsRef();
 const getCurrentStyleRef = () => styleRef;
 const getCurrentPropsRef = () => propsRef;
 

@@ -24,7 +24,11 @@ const LayoutStructureProps = {
   } as StructureItem,
 };
 
-const { selectStructure } = useStructure();
+const { selectStructure, setGlobalPropsRef } = useStructure('main');
+
+setGlobalPropsRef({
+  uid: '1',
+});
 </script>
 
 <template>

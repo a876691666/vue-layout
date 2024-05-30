@@ -31,6 +31,7 @@ const cacheMap: Record<
     structureMap: Map<string, StructureItem>;
     structureStyleMap: Map<string, Ref<StyleType>>;
     structurePropsMap: Map<string, any>;
+    globalPropsRef: Ref<{ [key: string]: any }>;
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
     selectParentStructure: Ref<string[]>;
@@ -46,6 +47,7 @@ export const useStructure = (_id?: string) => {
   let _structureMap = new Map<string, StructureItem>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();
   let _structurePropsMap = new Map<string, Ref<{ [key: string]: any }>>();
+  let globalPropsRef = ref<{ [key: string]: any }>({});
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
@@ -59,6 +61,7 @@ export const useStructure = (_id?: string) => {
       structureMap: _structureMap,
       structureStyleMap: _structureStyleMap,
       structurePropsMap: _structurePropsMap,
+      globalPropsRef: globalPropsRef,
       selectStructure: selectStructure,
       hoverStructure: hoverStructure,
       selectParentStructure: selectParentStructure,
@@ -69,6 +72,7 @@ export const useStructure = (_id?: string) => {
     _structureMap = cacheMap[id].structureMap;
     _structureStyleMap = cacheMap[id].structureStyleMap;
     _structurePropsMap = cacheMap[id].structurePropsMap;
+    globalPropsRef = cacheMap[id].globalPropsRef;
     selectStructure = cacheMap[id].selectStructure;
     hoverStructure = cacheMap[id].hoverStructure;
     selectParentStructure = cacheMap[id].selectParentStructure;
@@ -150,6 +154,14 @@ export const useStructure = (_id?: string) => {
       _structurePropsMap.set(uuid, propsRef);
     }
     return propsRef;
+  };
+
+  const getGlobalPropsRef = () => {
+    return globalPropsRef;
+  };
+
+  const setGlobalPropsRef = (props: { [key: string]: any }) => {
+    globalPropsRef.value = props;
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -336,5 +348,8 @@ export const useStructure = (_id?: string) => {
     handleSelectStructure,
     handleHoverStructure,
     setStructure,
+
+    getGlobalPropsRef,
+    setGlobalPropsRef,
   };
 };
