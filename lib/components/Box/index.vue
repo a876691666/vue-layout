@@ -4,15 +4,15 @@
     :props="{
       class: className,
       style: { ...style, ...styleRef },
-      'data-uuid': structure?.uuid,
-      'data-id': structure?.id,
-      'data-type': structure?.type,
+      'data-uuid': structureAgent?.uuid,
+      'data-id': structureAgent?.id,
+      'data-type': structureAgent?.type,
     }"
-    v-show="!structure?.hidden"
+    v-show="!structureAgent?.hidden"
   >
-    <template v-if="structure?.type === 'block'">
-      <template v-if="structure.children && structure.children.length">
-        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+    <template v-if="structureAgent?.type === 'block'">
+      <template v-if="structureAgent.children && structureAgent.children.length">
+        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -20,16 +20,16 @@
       </template>
       <slot
         v-else
-        :name="structure.id"
-        :structure="structure"
+        :name="structureAgent.id"
+        :structure="structureAgent"
         :styleRef="getCurrentStyleRef()"
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
     </template>
-    <template v-else-if="structure?.type === 'flex'" class="flex flex-wrap" :data-id="structure.id">
-      <template v-if="structure.children && structure.children.length">
-        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+    <template v-else-if="structureAgent?.type === 'flex'" class="flex flex-wrap" :data-id="structureAgent.id">
+      <template v-if="structureAgent.children && structureAgent.children.length">
+        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -37,16 +37,16 @@
       </template>
       <slot
         v-else
-        :name="structure.id"
-        :structure="structure"
+        :name="structureAgent.id"
+        :structure="structureAgent"
         :styleRef="getCurrentStyleRef()"
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
     </template>
-    <template v-else-if="structure?.type === 'position'" class="relative" :data-id="structure.id">
-      <template v-if="structure.children && structure.children.length">
-        <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+    <template v-else-if="structureAgent?.type === 'position'" class="relative" :data-id="structureAgent.id">
+      <template v-if="structureAgent.children && structureAgent.children.length">
+        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -54,17 +54,17 @@
       </template>
       <slot
         v-else
-        :name="structure.id"
-        :structure="structure"
+        :name="structureAgent.id"
+        :structure="structureAgent"
         :styleRef="getCurrentStyleRef()"
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
     </template>
-    <template v-else-if="structure?.type === 'vue'" :data-id="structure.id">
-      <component :is="structure.component" :="{ ...propsRef, ...globalPropsRef }">
-        <template v-if="structure.children && structure.children.length">
-          <LayoutBox v-for="(item, index) in structure.children" :key="index" :structure="item">
+    <template v-else-if="structureAgent?.type === 'vue'" :data-id="structureAgent.id">
+      <component :is="structureAgent.component" :="{ ...propsRef, ...globalPropsRef }">
+        <template v-if="structureAgent.children && structureAgent.children.length">
+          <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
             <template v-for="(_, name) in $slots" #[name]="slotProps">
               <slot :name="name" :="slotProps" />
             </template>
@@ -72,8 +72,8 @@
         </template>
         <slot
           v-else
-          :name="structure.id"
-          :structure="structure"
+          :name="structureAgent.id"
+          :structure="structureAgent"
           :styleRef="getCurrentStyleRef()"
           :propsRef="getCurrentPropsRef()"
           :globalPropsRef="getGlobalPropsRef()"
@@ -100,7 +100,8 @@ defineSlots<{
   }) => any;
 }>();
 
-const { getStyleRef, getPropsRef, getGlobalPropsRef } = useStructure();
+const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure } = useStructure();
+const structureAgent = findStructure(props.structure?.uuid || '');
 const styleRef = getStyleRef(props.structure?.uuid);
 const propsRef = getPropsRef(props.structure?.uuid);
 const globalPropsRef = getGlobalPropsRef();

@@ -4,11 +4,11 @@ import { v5 } from 'uuid';
 import mitt, { Emitter } from 'mitt';
 
 // 递归设置结构的uuid
-const setStructureUuid = (structure: StructureItem, structureMap: Map<string, StructureItem>) => {
+const setStructureUuid = (structure: StructureItem, structureMap: Map<string, Ref<StructureItem | undefined>>) => {
   if (!structure.uuid) {
     structure.uuid = v5(JSON.stringify(structure), v5.URL);
   }
-  structureMap.set(structure.uuid, structure);
+  structureMap.set(structure.uuid, ref(structure));
 
   structure.children?.forEach((child) => {
     setStructureUuid(child, structureMap);
@@ -28,9 +28,9 @@ const cacheMap: Record<
   string,
   {
     structure: Ref<StructureItem | undefined>;
-    structureMap: Map<string, StructureItem>;
+    structureMap: Map<string, Ref<StructureItem | undefined>>;
     structureStyleMap: Map<string, Ref<StyleType>>;
-    structurePropsMap: Map<string, any>;
+    structurePropsMap: Map<string, Ref<{ [key: string]: any }>>;
     globalPropsRef: Ref<{ [key: string]: any }>;
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
@@ -44,7 +44,7 @@ const isCtrl = ref(false);
 
 export const useStructure = (_id?: string) => {
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
-  let _structureMap = new Map<string, StructureItem>();
+  let _structureMap = new Map<string, Ref<StructureItem | undefined>>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();
   let _structurePropsMap = new Map<string, Ref<{ [key: string]: any }>>();
   let globalPropsRef = ref<{ [key: string]: any }>({});
@@ -95,28 +95,30 @@ export const useStructure = (_id?: string) => {
     const structure = _structureMap.get(uuid);
     if (!structure) return [];
 
-    if (structure.ignore) return getParentUuids(structure.parentUuid);
+    if (structure.value?.ignore) return getParentUuids(structure.value.parentUuid);
 
-    return [...getParentUuids(structure.parentUuid), uuid];
+    return [...getParentUuids(structure.value?.parentUuid), uuid];
   };
 
   const createStyleRef = (uuid: string) => {
-    const styleRef = ref<StyleType>(_structureMap.get(uuid)?.style || {});
+    const structure = _structureMap.get(uuid);
+    const styleRef = ref<StyleType>(_structureMap.get(uuid)?.value?.style || {});
 
     watch(styleRef, (style) => {
-      if (!_structureMap.get(uuid)) return;
-      _structureMap.get(uuid)!.style = style;
+      if (!structure?.value) return;
+      structure.value.style = style;
     });
 
     return styleRef;
   };
 
   const createPropsRef = (uuid: string) => {
-    const propsRef = ref(_structureMap.get(uuid)?.props || {});
+    const structure = _structureMap.get(uuid);
+    const propsRef = ref(structure?.value?.props || {});
 
     watch(propsRef, (props) => {
-      if (!_structureMap.get(uuid)) return;
-      _structureMap.get(uuid)!.props = props;
+      if (!structure?.value) return;
+      structure.value.props = props;
     });
 
     return propsRef;
@@ -190,8 +192,8 @@ export const useStructure = (_id?: string) => {
     window.removeEventListener('keyup', handleKeyUp);
   });
 
-  const getMousePointStructure = (event: MouseEvent): StructureItem | undefined => {
-    let result: StructureItem | undefined;
+  const getMousePointStructure = (event: MouseEvent): Ref<StructureItem | undefined> | undefined => {
+    let result: Ref<StructureItem | undefined> | undefined;
     // 最近的一个包含data-uuid属性的元素
     const selectUuid = findStructureFromDom(event.target as HTMLElement);
     const oldParentUuids = getParentUuids(selectStructure.value?.uuid);
@@ -227,7 +229,7 @@ export const useStructure = (_id?: string) => {
       }
     } else {
       const nextUuid = parentUuids[parentUuids.indexOf(selectStructure.value?.uuid || '') + 1];
-      if (!nextUuid) return selectStructure.value;
+      if (!nextUuid) return selectStructure;
       result = _structureMap.get(nextUuid);
     }
 
@@ -236,20 +238,20 @@ export const useStructure = (_id?: string) => {
 
   const handleSelectStructure = (event: MouseEvent) => {
     const structure = getMousePointStructure(event);
-    selectStructure.value = structure;
+    selectStructure.value = structure?.value;
 
     handleHoverStructure(event);
   };
 
   const handleHoverStructure = (event: MouseEvent) => {
     const structure = getMousePointStructure(event);
-    hoverStructure.value = structure;
+    hoverStructure.value = structure?.value;
   };
 
   const findUuidFromId = (id: string) => {
     let result: string | undefined;
-    _structureMap.forEach((value) => {
-      if (value.id === id) {
+    _structureMap.forEach(({ value }) => {
+      if (value && value.id === id) {
         result = value.uuid;
       }
     });
@@ -261,16 +263,16 @@ export const useStructure = (_id?: string) => {
       structure.uuid = v5(JSON.stringify(structure), v5.URL);
     }
 
-    if (!_structureMap.has(structure.uuid)) _structureMap.set(structure.uuid, structure);
+    if (!_structureMap.has(structure.uuid)) _structureMap.set(structure.uuid, ref(structure));
     if (!_structureStyleMap.has(structure.uuid)) _structureStyleMap.set(structure.uuid, createStyleRef(structure.uuid));
     if (!_structurePropsMap.has(structure.uuid)) _structurePropsMap.set(structure.uuid, createPropsRef(structure.uuid));
 
     if (parentUuid) {
       structure.parentUuid = parentUuid;
       const parent = _structureMap.get(parentUuid);
-      if (parent) {
-        if (!parent.children) parent.children = [];
-        parent.children.push(structure);
+      if (parent && parent.value) {
+        if (!parent.value.children) parent.value.children = [];
+        parent.value.children.push(structure);
       }
     }
 
@@ -281,10 +283,10 @@ export const useStructure = (_id?: string) => {
     const structure = _structureMap.get(uuid);
     if (!structure) return;
 
-    if (structure.parentUuid) {
-      const parent = _structureMap.get(structure.parentUuid);
-      if (parent) {
-        parent.children = parent.children?.filter((child) => child.uuid !== uuid);
+    if (structure.value?.parentUuid) {
+      const parent = _structureMap.get(structure.value.parentUuid);
+      if (parent && parent.value) {
+        parent.value.children = parent.value.children?.filter((child) => child.uuid !== uuid);
       }
     }
 
@@ -294,7 +296,7 @@ export const useStructure = (_id?: string) => {
   };
 
   const updateStructure = (uuid: string, structure: StructureItem) => {
-    const oldStructure = _structureMap.get(uuid);
+    const oldStructure = _structureMap.get(uuid)?.value;
     if (!oldStructure) return;
 
     if (structure.label) {
