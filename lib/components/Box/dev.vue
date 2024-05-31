@@ -12,17 +12,27 @@
     @click.stop="handleSelectStructure"
     v-if="dev"
   >
+    <slot />
     <template v-if="showDrag">
-      <div class="layout-box-dev-drag-before-sketch" :class="{ 'layout-box-dev-drag-before-sketch-selected': selectBefore }"></div>
-      <div class="layout-box-dev-drag-center-sketch" :class="{ 'layout-box-dev-drag-center-sketch-selected': selectCenter }">
-        <slot />
-      </div>
-      <div class="layout-box-dev-drag-after-sketch" :class="{ 'layout-box-dev-drag-after-sketch-selected': selectAfter }"></div>
-      <div class="layout-box-dev-drag-before" @pointerenter="selectBefore = true" @pointerleave="selectBefore = false"></div>
-      <div class="layout-box-dev-drag-center" @pointerenter="selectCenter = true" @pointerleave="selectCenter = false"></div>
-      <div class="layout-box-dev-drag-after" @pointerenter="selectAfter = true" @pointerleave="selectAfter = false"></div>
+      <div
+        class="layout-box-dev-drag-before"
+        :class="{ 'layout-box-dev-drag-before-selected': selectBefore }"
+        @pointerenter="selectBefore = true"
+        @pointerleave="selectBefore = false"
+      ></div>
+      <div
+        class="layout-box-dev-drag-center"
+        :class="{ 'layout-box-dev-drag-center-selected': selectCenter }"
+        @pointerenter="selectCenter = true"
+        @pointerleave="selectCenter = false"
+      ></div>
+      <div
+        class="layout-box-dev-drag-after"
+        :class="{ 'layout-box-dev-drag-after-selected': selectAfter }"
+        @pointerenter="selectAfter = true"
+        @pointerleave="selectAfter = false"
+      ></div>
     </template>
-    <slot v-else />
   </div>
   <div :="props" class="layout-box" v-else>
     <slot />
@@ -53,8 +63,7 @@ const selectCenter = ref(false);
   height: 25%;
   left: 0;
   right: 0;
-  text-align: center;
-  color: #000;
+  background: rgba(150, 0, 0, 0.05);
 }
 .layout-box-dev-drag-center {
   position: absolute;
@@ -62,8 +71,7 @@ const selectCenter = ref(false);
   height: 50%;
   left: 0;
   right: 0;
-  text-align: center;
-  color: #000;
+  background: rgba(0, 150, 0, 0.05);
 }
 .layout-box-dev-drag-after {
   position: absolute;
@@ -71,8 +79,7 @@ const selectCenter = ref(false);
   height: 25%;
   left: 0;
   right: 0;
-  text-align: center;
-  color: #000;
+  background: rgba(0, 0, 150, 0.05);
 }
 .layout-box-dev-drag::after {
   content: '';
@@ -84,29 +91,14 @@ const selectCenter = ref(false);
   border: 3px dashed #000;
   pointer-events: none;
 }
-.layout-box-dev-drag-center-sketch {
-  position: relative;
-  border: 1px dashed red;
-  background: rgba(0, 0, 0, 0.1);
-}
-.layout-box-dev-drag-before-sketch {
-  height: 20px;
-  border: 1px dashed red;
-  background: rgba(0, 0, 0, 0.1);
-}
-.layout-box-dev-drag-after-sketch {
-  height: 20px;
-  border: 1px dashed red;
-  background: rgba(0, 0, 0, 0.1);
-}
 
-.layout-box-dev-drag-center-sketch-selected {
-  background: rgba(255, 255, 255, 0.2);
+.layout-box-dev-drag-center-selected {
+  background: rgba(255, 255, 255, 0.4);
 }
-.layout-box-dev-drag-before-sketch-selected {
-  background: rgba(255, 255, 255, 0.2);
+.layout-box-dev-drag-before-selected {
+  background: rgba(255, 255, 255, 0.4);
 }
-.layout-box-dev-drag-after-sketch-selected {
-  background: rgba(255, 255, 255, 0.2);
+.layout-box-dev-drag-after-selected {
+  background: rgba(255, 255, 255, 0.4);
 }
 </style>

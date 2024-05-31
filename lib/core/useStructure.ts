@@ -259,7 +259,7 @@ export const useStructure = (_id?: string) => {
     return result;
   };
 
-  const addStructure = (structure: StructureItem, parentUuid: string, before?: boolean) => {
+  const addStructure = (structure: StructureItem, parentUuid: string, index?: number) => {
     if (!structure.uuid) {
       structure.uuid = v5(JSON.stringify(structure), v5.URL);
     }
@@ -273,7 +273,7 @@ export const useStructure = (_id?: string) => {
       const parent = _structureMap.get(parentUuid);
       if (parent && parent.value) {
         if (!parent.value.children) parent.value.children = [];
-        if (before) parent.value.children.unshift(structure);
+        if (typeof index !== 'undefined') parent.value.children.splice(index, 0, structure);
         else parent.value.children.push(structure);
       }
     }

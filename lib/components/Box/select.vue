@@ -1,6 +1,7 @@
 <template>
   <div
     class="layout-box-selected"
+    :class="{ 'layout-box-selected-drag': isDrag }"
     ref="domRef"
     v-if="selectStructure"
     :style="{
@@ -24,7 +25,7 @@
 import { onMounted, ref, watch, nextTick, onUnmounted, computed } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure, getStyleRef, isCtrl, event } = useStructure();
+const { selectStructure, getStyleRef, isCtrl, event, isDrag } = useStructure();
 
 const styleRef = computed(() => getStyleRef(selectStructure.value?.uuid)?.value);
 watch(selectStructure, () => nextTick(() => updateRect()));
@@ -242,5 +243,23 @@ onUnmounted(() => {
 .control-disabled {
   opacity: 0.8;
   cursor: not-allowed;
+}
+
+.layout-box-selected-drag {
+  .control-top {
+    pointer-events: none;
+  }
+  .control-left {
+    pointer-events: none;
+  }
+  .control-right {
+    pointer-events: none;
+  }
+  .control-bottom {
+    pointer-events: none;
+  }
+  .control-move {
+    pointer-events: none;
+  }
 }
 </style>
