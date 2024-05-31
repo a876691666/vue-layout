@@ -13,7 +13,7 @@
   >
     <template v-if="structureAgent?.type === 'block'">
       <template v-if="structureAgent.children && structureAgent.children.length">
-        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
+        <LayoutBox v-for="item in structureAgent.children" :key="item.uuid" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -30,7 +30,7 @@
     </template>
     <template v-else-if="structureAgent?.type === 'flex'" class="flex flex-wrap" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
-        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
+        <LayoutBox v-for="item in structureAgent.children" :key="item.uuid" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -47,7 +47,7 @@
     </template>
     <template v-else-if="structureAgent?.type === 'position'" class="relative" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
-        <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
+        <LayoutBox v-for="item in structureAgent.children" :key="item.uuid" :structure="item">
           <template v-for="(_, name) in $slots" #[name]="slotProps">
             <slot :name="name" :="slotProps" />
           </template>
@@ -65,7 +65,7 @@
     <template v-else-if="structureAgent?.type === 'vue'" :data-id="structureAgent.id">
       <component :is="structureAgent.component" :="{ ...propsRef, ...(structure?.noGlobalProps ? {} : globalPropsRef) }">
         <template v-if="structureAgent.children && structureAgent.children.length">
-          <LayoutBox v-for="(item, index) in structureAgent.children" :key="index" :structure="item">
+          <LayoutBox v-for="item in structureAgent.children" :key="item.uuid" :structure="item">
             <template v-for="(_, name) in $slots" #[name]="slotProps">
               <slot :name="name" :="slotProps" />
             </template>
