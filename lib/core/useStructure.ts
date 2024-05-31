@@ -6,7 +6,7 @@ import mitt, { Emitter } from 'mitt';
 // 递归设置结构的uuid
 const setStructureUuid = (structure: StructureItem, structureMap: Map<string, Ref<StructureItem | undefined>>) => {
   if (!structure.uuid) {
-    structure.uuid = v5(JSON.stringify(structure), v5.URL);
+    structure.uuid = v5(Math.random().toString(), v5.URL);
   }
   structureMap.set(structure.uuid, ref(structure));
 
@@ -41,6 +41,7 @@ const cacheMap: Record<
 
 const isAlt = ref(false);
 const isCtrl = ref(false);
+const isDrag = ref(false);
 
 export const useStructure = (_id?: string) => {
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
@@ -258,7 +259,7 @@ export const useStructure = (_id?: string) => {
     return result;
   };
 
-  const addStructure = (structure: StructureItem, parentUuid: string) => {
+  const addStructure = (structure: StructureItem, parentUuid: string, before?: boolean) => {
     if (!structure.uuid) {
       structure.uuid = v5(JSON.stringify(structure), v5.URL);
     }
@@ -272,7 +273,8 @@ export const useStructure = (_id?: string) => {
       const parent = _structureMap.get(parentUuid);
       if (parent && parent.value) {
         if (!parent.value.children) parent.value.children = [];
-        parent.value.children.push(structure);
+        if (before) parent.value.children.unshift(structure);
+        else parent.value.children.push(structure);
       }
     }
 
@@ -333,25 +335,41 @@ export const useStructure = (_id?: string) => {
     return _structureMap.get(uuid);
   };
 
+  const dragStart = () => {
+    isDrag.value = true;
+  };
+
+  const dragEnd = () => {
+    isDrag.value = false;
+  };
+
   return {
     isAlt,
     isCtrl,
+
     event,
+
     addStructure,
     removeStructure,
     updateStructure,
     findStructure,
+    findUuidFromId,
+
     getStyleRef,
     getPropsRef,
-    findUuidFromId,
+
     structure: _structure,
+    setStructure,
     selectStructure,
     hoverStructure,
     handleSelectStructure,
     handleHoverStructure,
-    setStructure,
 
     getGlobalPropsRef,
     setGlobalPropsRef,
+
+    isDrag,
+    dragStart,
+    dragEnd,
   };
 };

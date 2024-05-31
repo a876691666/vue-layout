@@ -8,6 +8,7 @@
       'data-id': structureAgent?.id,
       'data-type': structureAgent?.type,
     }"
+    :structure="structureAgent"
     v-show="!structureAgent?.hidden"
   >
     <template v-if="structureAgent?.type === 'block'">
@@ -186,6 +187,6 @@ updateClassName();
   height: 100%;
 }
 .layout-box-position-leaf {
-  position: absolute;
+  position: absolute !important;
 }
 </style>

@@ -53,6 +53,11 @@ export type BaseStructureItem = {
    * 是否使用全局属性
    */
   noGlobalProps?: boolean;
+
+  /**
+   * 显示拖拽边框
+   */
+  showDrag?: boolean;
 };
 
 export type PositionStructureItem = {

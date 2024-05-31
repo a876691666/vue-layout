@@ -16,7 +16,10 @@ const LayoutStructureProps = {
         style: { left: '400px', top: '400px' },
         positionLeaf: true,
         component: 'div',
-        children: [{ type: 'block', id: 'logo', style: { width: '250px' } }],
+        children: [
+          { type: 'block', id: 'logo', style: { width: '250px' }, showDrag: true },
+          { type: 'block', id: 'logo', style: { width: '250px' }, showDrag: true },
+        ],
       },
       { style: { left: '100px', top: '100px' }, type: 'block', positionLeaf: true, id: 'menu' },
       { style: { left: '600px', top: '600px' }, type: 'block', positionLeaf: true, id: 'footer' },
@@ -24,7 +27,8 @@ const LayoutStructureProps = {
   } as StructureItem,
 };
 
-const { selectStructure, setGlobalPropsRef } = useStructure('main');
+const { selectStructure, setGlobalPropsRef, isDrag } = useStructure('main');
+isDrag.value = true;
 
 setGlobalPropsRef({
   uid: '1',
