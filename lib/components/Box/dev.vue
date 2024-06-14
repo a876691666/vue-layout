@@ -9,7 +9,8 @@
     }"
     @pointerenter="handleHoverStructure"
     @pointerleave="hoverStructure = undefined"
-    @click.stop="handleSelectStructure"
+    @pointerdown.stop.passive="handleStartSelectStructure"
+    draggable="false"
     v-if="dev"
   >
     <slot />
@@ -39,23 +40,94 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useStructure } from '../../core/useStructure';
 import { StructureItem } from '../../types';
 
 const props = withDefaults(defineProps<{ dev?: boolean; props: any; structure?: StructureItem }>(), { dev: false });
 
-const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure, isDrag } = useStructure();
+const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure, isDrag, getStyleRef } = useStructure();
 
 const showDrag = computed(() => isDrag.value && props.structure?.showDrag);
 
 const selectBefore = ref(false);
 const selectAfter = ref(false);
 const selectCenter = ref(false);
+
+const isMove = ref(false);
+const isDown = ref(false);
+
+watch(isDown, (d) => {
+  if (!d) isMove.value = false;
+});
+
+const pointer = ref({ x: 0, y: 0 });
+const startPointer = ref({ x: 0, y: 0 });
+const moveScale = ref({ x: 1, y: 1 });
+
+const handleMoveSelectStructure = (event: MouseEvent) => {
+  if (!isDown.value) return;
+  const currnetPointer = { x: event.clientX, y: event.clientY };
+  const distance = Math.sqrt(Math.pow(currnetPointer.x - startPointer.value.x, 2) + Math.pow(currnetPointer.y - startPointer.value.y, 2));
+  if (Math.abs(distance) > 5) {
+    isMove.value = true;
+  }
+
+  const diffX = currnetPointer.x - pointer.value.x;
+  const diffY = currnetPointer.y - pointer.value.y;
+
+  pointer.value = { x: currnetPointer.x, y: currnetPointer.y };
+  if (isMove.value) {
+    if (selectStructure.value?.positionLeaf) {
+      const styleRef = getStyleRef(selectStructure.value?.uuid);
+
+      if (!styleRef?.value) return;
+      styleRef.value.left = `${parseFloat(styleRef.value.left || '0') + diffX * moveScale.value.x}px`;
+      styleRef.value.top = `${parseFloat(styleRef.value.top || '0') + diffY * moveScale.value.y}px`;
+    }
+  }
+};
+
+const handleStartSelectStructure = (e: MouseEvent) => {
+  startPointer.value = { x: e.clientX, y: e.clientY };
+  pointer.value = { x: e.clientX, y: e.clientY };
+  e.stopPropagation();
+
+  if (selectStructure.value) {
+    const target = document.querySelector(`[data-uuid="${selectStructure.value.uuid}"]`) as HTMLElement;
+
+    if (target) {
+      const bbox = target!.getBoundingClientRect();
+      moveScale.value = { x: target.clientWidth / bbox.width, y: target?.clientHeight / bbox.height };
+    }
+  }
+
+  isDown.value = true;
+
+  const handleEndSelectStructure = (event: MouseEvent) => {
+    if (!isMove.value) {
+      handleSelectStructure(event);
+    }
+    isDown.value = false;
+
+    window.removeEventListener('pointermove', handleMoveSelectStructure);
+    window.removeEventListener('pointerup', handleEndSelectStructure);
+  };
+  window.addEventListener('pointermove', handleMoveSelectStructure);
+  window.addEventListener('pointerup', handleEndSelectStructure);
+};
 </script>
 <style scoped>
+.layout-box > * {
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
 .layout-box {
   position: relative;
+  user-select: none;
+  pointer-events: all;
+  -webkit-user-drag: none;
 }
 .layout-box-dev-drag-before {
   position: absolute;

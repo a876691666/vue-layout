@@ -18,14 +18,13 @@
     <div class="control-left" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
     <div class="control-right" @pointerdown="handleRightStart"></div>
     <div class="control-bottom" @pointerdown="handleBottomStart"></div>
-    <div class="control-move" v-if="selectStructure.positionLeaf && isCtrl" @pointerdown="handleMoveStart"></div>
   </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref, watch, nextTick, onUnmounted, computed } from 'vue';
 import { useStructure } from '../../core/useStructure';
 
-const { selectStructure, getStyleRef, isCtrl, event, isDrag } = useStructure();
+const { selectStructure, getStyleRef, event, isDrag } = useStructure();
 
 const styleRef = computed(() => getStyleRef(selectStructure.value?.uuid)?.value);
 watch(selectStructure, () => nextTick(() => updateRect()));
@@ -64,28 +63,6 @@ const handleRightStart = (e: PointerEvent) => {
     if (!selectStructure.value || !styleRef.value) return;
     const moveLength = startWidth + e.clientX - startX;
     styleRef.value.width = `${moveLength / sizeScale.value.x}px`;
-  };
-  const handleEnd = () => {
-    window.removeEventListener('pointermove', handleMove);
-    window.removeEventListener('pointerup', handleEnd);
-  };
-  window.addEventListener('pointermove', handleMove);
-  window.addEventListener('pointerup', handleEnd);
-};
-
-const handleMoveStart = (e: PointerEvent) => {
-  if (!selectStructure.value || !styleRef.value) return;
-  updateRect();
-  const startX = e.clientX;
-  const startY = e.clientY;
-  const startLeft = parseInt(styleRef.value.left || '0');
-  const startTop = parseInt(styleRef.value.top || '0');
-  const handleMove = (e: PointerEvent) => {
-    if (!selectStructure.value || !styleRef.value) return;
-    const moveLeft = startLeft + (e.clientX - startX) / sizeScale.value.x;
-    const moveTop = startTop + (e.clientY - startY) / sizeScale.value.y;
-    styleRef.value.left = `${moveLeft}px`;
-    styleRef.value.top = `${moveTop}px`;
   };
   const handleEnd = () => {
     window.removeEventListener('pointermove', handleMove);

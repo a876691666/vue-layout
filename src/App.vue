@@ -28,7 +28,7 @@ const LayoutStructureProps = {
 };
 
 const { selectStructure, setGlobalPropsRef, isDrag } = useStructure('main');
-isDrag.value = true;
+// isDrag.value = true;
 
 setGlobalPropsRef({
   uid: '1',
@@ -36,7 +36,9 @@ setGlobalPropsRef({
 </script>
 
 <template>
-  {{ selectStructure?.id }}
+  <p>
+    {{ selectStructure?.id || '-' }}
+  </p>
   <div class="flex">
     <LayoutStructureProvide id="main" :structure="LayoutStructureProps.structure">
       <div class="w-48">
