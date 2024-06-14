@@ -93,6 +93,15 @@ const handleStartSelectStructure = (e: MouseEvent) => {
   pointer.value = { x: e.clientX, y: e.clientY };
   e.stopPropagation();
 
+  let flag = false;
+  if (
+    !selectStructure.value ||
+    (selectStructure.value !== hoverStructure.value && hoverStructure.value?.parentUuid !== selectStructure.value?.uuid)
+  ) {
+    handleSelectStructure(e);
+    flag = true;
+  }
+
   if (selectStructure.value) {
     const target = document.querySelector(`[data-uuid="${selectStructure.value.uuid}"]`) as HTMLElement;
 
@@ -105,7 +114,7 @@ const handleStartSelectStructure = (e: MouseEvent) => {
   isDown.value = true;
 
   const handleEndSelectStructure = (event: MouseEvent) => {
-    if (!isMove.value) {
+    if (!isMove.value && !flag) {
       handleSelectStructure(event);
     }
     isDown.value = false;
