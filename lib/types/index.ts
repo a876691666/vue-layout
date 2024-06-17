@@ -20,6 +20,26 @@ export type BaseStructureItem = {
   children?: StructureItem[];
 
   /**
+   * 是否可以拖拽顶部
+   */
+  dragTop?: boolean;
+
+  /**
+   * 是否可以拖拽左侧
+   */
+  dragLeft?: boolean;
+
+  /**
+   * 是否可以拖拽右侧
+   */
+  dragRight?: boolean;
+
+  /**
+   * 是否可以拖拽底部
+   */
+  dragBottom?: boolean;
+
+  /**
    * 是否是叶子节点
    */
   positionLeaf?: boolean;

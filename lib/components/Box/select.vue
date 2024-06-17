@@ -14,10 +14,10 @@
       transform: `translate(${-reoffset.x}px, ${-reoffset.y}px)`,
     }"
   >
-    <div class="control-top" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
-    <div class="control-left" :class="{ 'control-disabled': !selectStructure?.positionLeaf }"></div>
-    <div class="control-right" @pointerdown="handleRightStart"></div>
-    <div class="control-bottom" @pointerdown="handleBottomStart"></div>
+    <div class="control-top" :class="{ 'control-disabled': !selectStructure?.dragTop }" @pointerdown="handleTopStart"></div>
+    <div class="control-left" :class="{ 'control-disabled': !selectStructure?.dragLeft }" @pointerdown="handleLeftStart"></div>
+    <div class="control-right" :class="{ 'control-disabled': !selectStructure?.dragRight }" @pointerdown="handleRightStart"></div>
+    <div class="control-bottom" :class="{ 'control-disabled': !selectStructure?.dragBottom }" @pointerdown="handleBottomStart"></div>
   </div>
 </template>
 <script setup lang="ts">
@@ -35,6 +35,46 @@ const rect = ref<DOMRect | null>(null);
 const realSize = ref({ width: 0, height: 0, x: 0, y: 0 });
 const sizeScale = ref({ x: 1, y: 1 });
 const reoffset = ref({ x: 0, y: 0 });
+
+const handleLeftStart = (e: PointerEvent) => {
+  if (!selectStructure.value) return;
+  updateRect();
+  const startX = e.clientX;
+  const startWidth = rect.value?.width || 0;
+  const startLeft = parseFloat(styleRef.value?.left || '0');
+  const handleMove = (e: PointerEvent) => {
+    if (!selectStructure.value || !styleRef.value) return;
+    const moveLength = startWidth - (e.clientX - startX);
+    styleRef.value.width = `${moveLength / sizeScale.value.x}px`;
+    styleRef.value.left = `${startLeft + (e.clientX - startX) / sizeScale.value.x}px`;
+  };
+  const handleEnd = () => {
+    window.removeEventListener('pointermove', handleMove);
+    window.removeEventListener('pointerup', handleEnd);
+  };
+  window.addEventListener('pointermove', handleMove);
+  window.addEventListener('pointerup', handleEnd);
+};
+
+const handleTopStart = (e: PointerEvent) => {
+  if (!selectStructure.value) return;
+  updateRect();
+  const startY = e.clientY;
+  const startHeight = rect.value?.height || 0;
+  const startTop = parseFloat(styleRef.value?.top || '0');
+  const handleMove = (e: PointerEvent) => {
+    if (!selectStructure.value || !styleRef.value) return;
+    const moveLength = startHeight - (e.clientY - startY);
+    styleRef.value.height = `${moveLength / sizeScale.value.y}px`;
+    styleRef.value.top = `${startTop + (e.clientY - startY) / sizeScale.value.y}px`;
+  };
+  const handleEnd = () => {
+    window.removeEventListener('pointermove', handleMove);
+    window.removeEventListener('pointerup', handleEnd);
+  };
+  window.addEventListener('pointermove', handleMove);
+  window.addEventListener('pointerup', handleEnd);
+};
 
 const handleBottomStart = (e: PointerEvent) => {
   if (!selectStructure.value) return;

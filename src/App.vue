@@ -21,7 +21,7 @@ const LayoutStructureProps = {
           { type: 'block', id: 'logo', style: { width: '250px' }, showDrag: true },
         ],
       },
-      { style: { left: '100px', top: '100px' }, type: 'block', positionLeaf: true, id: 'menu' },
+      { style: { left: '100px', top: '100px' }, type: 'block', positionLeaf: true, dragTop: true, id: 'menu' },
       { style: { left: '600px', top: '600px' }, type: 'block', positionLeaf: true, id: 'footer' },
     ],
   } as StructureItem,
