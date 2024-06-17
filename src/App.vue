@@ -27,8 +27,8 @@ const LayoutStructureProps = {
   } as StructureItem,
 };
 
-const { selectStructure, setGlobalPropsRef } = useStructure('main');
-// isDrag.value = true;
+const { selectStructure, setGlobalPropsRef, isDrag } = useStructure('main');
+isDrag.value = false;
 
 setGlobalPropsRef({
   uid: '1',

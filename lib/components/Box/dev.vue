@@ -139,6 +139,7 @@ const handleStartSelectStructure = (e: MouseEvent) => {
   -webkit-user-drag: none;
 }
 .layout-box-dev-drag-before {
+  pointer-events: all;
   position: absolute;
   top: 0;
   height: 25%;
@@ -147,6 +148,7 @@ const handleStartSelectStructure = (e: MouseEvent) => {
   background: rgba(150, 0, 0, 0.05);
 }
 .layout-box-dev-drag-center {
+  pointer-events: all;
   position: absolute;
   top: 25%;
   height: 50%;
@@ -155,6 +157,7 @@ const handleStartSelectStructure = (e: MouseEvent) => {
   background: rgba(0, 150, 0, 0.05);
 }
 .layout-box-dev-drag-after {
+  pointer-events: all;
   position: absolute;
   bottom: 0;
   height: 25%;
