@@ -12,6 +12,9 @@
     :structure="structureAgent"
     v-show="!structureAgent?.hidden"
   >
+    <template #_tools="{ structure }">
+      <slot name="_tools" :structure="structure" />
+    </template>
     <template v-if="structureAgent?.type === 'block'">
       <template v-if="structureAgent.children && structureAgent.children.length">
         <LayoutBox v-for="(item, index) in structureAgent.children" :key="item.uuid" :structure="item" :index="index">
@@ -28,7 +31,6 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
-      <slot name="_tools" :structure="structureAgent" v-if="selectStructure && selectStructure.uuid === structureAgent.uuid" />
     </template>
     <template v-else-if="structureAgent?.type === 'flex'" class="flex flex-wrap" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
@@ -46,7 +48,6 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
-      <slot name="_tools" :structure="structureAgent" v-if="selectStructure && selectStructure.uuid === structureAgent.uuid" />
     </template>
     <template v-else-if="structureAgent?.type === 'position'" class="relative" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
@@ -64,7 +65,6 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
-      <slot name="_tools" :structure="structureAgent" v-if="selectStructure && selectStructure.uuid === structureAgent.uuid" />
     </template>
     <template v-else-if="structureAgent?.type === 'vue'" :data-id="structureAgent.id">
       <slot
@@ -91,7 +91,6 @@
           :propsRef="getCurrentPropsRef()"
           :globalPropsRef="getGlobalPropsRef()"
         />
-        <slot name="_tools" :structure="structureAgent" v-if="selectStructure && selectStructure.uuid === structureAgent.uuid" />
       </component>
     </template>
   </LayoutDevBox>

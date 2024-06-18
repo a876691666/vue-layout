@@ -14,6 +14,7 @@
     v-if="dev"
   >
     <slot />
+    <slot name="_tools" :structure="structure" v-if="selectStructure && selectStructure === structure" />
     <template v-if="showDrag">
       <div
         class="layout-box-dev-drag-before"
