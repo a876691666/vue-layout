@@ -53,6 +53,7 @@ setGlobalPropsRef({
       <div style="width: 1000px; height: 1000px; background-color: #ccc; position: relative" class="w-full">
         <div style="transform: scale(0.8); width: 100%; height: 100%">
           <LayoutStructure :style="LayoutStructureProps.style">
+            <template #_tools="{ structure }">{{ structure }}</template>
             <template #logo>
               <img class="logo" src="https://vuejs.org/images/logo.png" alt="Vue logo" />
             </template>

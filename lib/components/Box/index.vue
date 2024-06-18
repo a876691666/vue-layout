@@ -28,6 +28,7 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
+      <slot name="_tools" :structure="structure" v-if="selectStructure && selectStructure === structure" />
     </template>
     <template v-else-if="structureAgent?.type === 'flex'" class="flex flex-wrap" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
@@ -45,6 +46,7 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
+      <slot name="_tools" :structure="structure" v-if="selectStructure && selectStructure === structure" />
     </template>
     <template v-else-if="structureAgent?.type === 'position'" class="relative" :data-id="structureAgent.id">
       <template v-if="structureAgent.children && structureAgent.children.length">
@@ -62,6 +64,7 @@
         :propsRef="getCurrentPropsRef()"
         :globalPropsRef="getGlobalPropsRef()"
       />
+      <slot name="_tools" :structure="structure" v-if="selectStructure && selectStructure === structure" />
     </template>
     <template v-else-if="structureAgent?.type === 'vue'" :data-id="structureAgent.id">
       <slot
@@ -88,6 +91,7 @@
           :propsRef="getCurrentPropsRef()"
           :globalPropsRef="getGlobalPropsRef()"
         />
+        <slot name="_tools" :structure="structure" v-if="selectStructure && selectStructure === structure" />
       </component>
     </template>
   </LayoutDevBox>
@@ -108,9 +112,10 @@ defineSlots<{
     propsRef?: Ref<{ [key: string]: any }>;
     globalPropsRef?: Ref<{ [key: string]: any }>;
   }) => any;
+  _tools: (props: { structure?: StructureItem }) => any;
 }>();
 
-const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure } = useStructure();
+const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure, selectStructure } = useStructure();
 const structureAgent = findStructure(props.structure?.uuid || '');
 const styleRef = getStyleRef(props.structure?.uuid);
 const propsRef = getPropsRef(props.structure?.uuid);
