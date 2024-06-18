@@ -114,7 +114,7 @@ defineSlots<{
   _tools: (props: { structure?: StructureItem }) => any;
 }>();
 
-const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure, selectStructure } = useStructure();
+const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure } = useStructure();
 const structureAgent = findStructure(props.structure?.uuid || '');
 const styleRef = getStyleRef(props.structure?.uuid);
 const propsRef = getPropsRef(props.structure?.uuid);
