@@ -343,6 +343,29 @@ export const useStructure = (_id?: string) => {
     isDrag.value = false;
   };
 
+  const dispose = () => {
+    delete cacheMap[id];
+
+    _structureMap.clear();
+    _structureStyleMap.clear();
+    _structurePropsMap.clear();
+    globalPropsRef.value = {};
+    selectStructure.value = undefined;
+    hoverStructure.value = undefined;
+    selectParentStructure.value = [];
+
+    event.all.clear();
+
+    _structure.value = undefined;
+
+    isAlt.value = false;
+    isCtrl.value = false;
+    isDrag.value = false;
+
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('keyup', handleKeyUp);
+  };
+
   return {
     isAlt,
     isCtrl,
@@ -371,5 +394,7 @@ export const useStructure = (_id?: string) => {
     isDrag,
     dragStart,
     dragEnd,
+
+    dispose,
   };
 };
