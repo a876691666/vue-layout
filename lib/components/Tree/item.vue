@@ -13,7 +13,7 @@
       </slot>
     </div>
     <template v-if="structure.children && structure.children.length">
-      <LayoutTreeItem :structure="item" v-for="item in structure.children" :key="item.uuid">
+      <LayoutTreeItem :structure="item" v-for="item in getChildren(structure)" :key="item.uuid">
         <template #default="defaultProps">
           <slot :="defaultProps" />
         </template>
@@ -31,6 +31,13 @@ defineOptions({ name: 'LayoutTreeItem' });
 defineSlots<{ default(props: { structure: StructureItem; isSelect: boolean; isHover: boolean }): any }>();
 
 withDefaults(defineProps<{ structure?: StructureItem }>(), {});
+
+const getChildren = (structure: StructureItem) => {
+  if (structure.treeReverse) {
+    return structure.children?.slice().reverse();
+  }
+  return structure.children;
+};
 
 const { selectStructure, hoverStructure } = useStructure();
 </script>

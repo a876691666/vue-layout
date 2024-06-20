@@ -20,6 +20,11 @@ export type BaseStructureItem = {
   children?: StructureItem[];
 
   /**
+   * 反转显示子树
+   */
+  treeReverse?: boolean;
+
+  /**
    * 是否可以拖拽顶部
    */
   dragTop?: boolean;
