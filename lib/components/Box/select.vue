@@ -14,10 +14,17 @@
       transform: `translate(${-reoffset.x}px, ${-reoffset.y}px)`,
     }"
   >
-    <div class="control-top" :class="{ 'control-disabled': !selectStructure?.dragTop }" @pointerdown="handleTopStart"></div>
-    <div class="control-left" :class="{ 'control-disabled': !selectStructure?.dragLeft }" @pointerdown="handleLeftStart"></div>
-    <div class="control-right" :class="{ 'control-disabled': !selectStructure?.dragRight }" @pointerdown="handleRightStart"></div>
-    <div class="control-bottom" :class="{ 'control-disabled': !selectStructure?.dragBottom }" @pointerdown="handleBottomStart"></div>
+    <div v-if="selectStructure?.dragTop" class="control-top" @pointerdown="handleTopStart"></div>
+    <div v-else class="control-top control-disabled"></div>
+
+    <div v-if="selectStructure?.dragLeft" class="control-left" @pointerdown="handleLeftStart"></div>
+    <div v-else class="control-left control-disabled"></div>
+
+    <div v-if="selectStructure?.dragRight" class="control-right" @pointerdown="handleRightStart"></div>
+    <div v-else class="control-right control-disabled"></div>
+
+    <div v-if="selectStructure?.dragBottom" class="control-bottom" @pointerdown="handleBottomStart"></div>
+    <div v-else class="control-bottom control-disabled"></div>
   </div>
 </template>
 <script setup lang="ts">
