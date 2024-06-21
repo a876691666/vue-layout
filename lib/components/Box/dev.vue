@@ -90,6 +90,7 @@ const handleMoveSelectStructure = (event: MouseEvent) => {
 };
 
 const handleStartSelectStructure = (e: MouseEvent) => {
+  if (e.button !== 0) return;
   startPointer.value = { x: e.clientX, y: e.clientY };
   pointer.value = { x: e.clientX, y: e.clientY };
   e.stopPropagation();
