@@ -43,7 +43,36 @@ const isAlt = ref(false);
 const isCtrl = ref(false);
 const isDrag = ref(false);
 
-export const useStructure = (_id?: string) => {
+export type StructureStoreType = {
+  isAlt: Ref<boolean>;
+  isCtrl: Ref<boolean>;
+  event: Emitter<{ updateSelectRect: void }>;
+  addStructure: (structure: StructureItem, parentUuid: string, index?: number) => void;
+  removeStructure: (uuid: string) => void;
+  updateStructure: (uuid: string, structure: StructureItem) => void;
+  findStructure: (uuid: string) => Ref<StructureItem | undefined> | undefined;
+  findUuidFromId: (id: string) => string | undefined;
+  getStyleRef: (uuid?: string) => Ref<StyleType> | undefined;
+  getPropsRef: (uuid?: string) => Ref<{ [key: string]: any }> | undefined;
+  structure: Ref<StructureItem | undefined>;
+  setStructure: (structure?: StructureItem) => void;
+  selectStructure: Ref<StructureItem | undefined>;
+  hoverStructure: Ref<StructureItem | undefined>;
+  handleSelectStructure: (event: MouseEvent) => void;
+  handleHoverStructure: (event: MouseEvent) => void;
+  getGlobalPropsRef: () => Ref<{ [key: string]: any }>;
+  setGlobalPropsRef: (props: { [key: string]: any }) => void;
+  isDrag: Ref<boolean>;
+  dragStart: () => void;
+  dragEnd: () => void;
+  dispose: () => void;
+};
+
+export const useStructure = (_id?: string): StructureStoreType => {
+  const structureStore = inject<StructureStoreType>('structureStore');
+
+  if (structureStore) return structureStore;
+
   let _structure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let _structureMap = new Map<string, Ref<StructureItem | undefined>>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();

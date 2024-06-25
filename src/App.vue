@@ -27,7 +27,12 @@ const LayoutStructureProps = {
   } as StructureItem,
 };
 
-const { selectStructure, setGlobalPropsRef, isDrag } = useStructure('main');
+const structureStore = useStructure('main');
+
+const { selectStructure, setGlobalPropsRef, isDrag, setStructure } = structureStore;
+
+setStructure(LayoutStructureProps.structure);
+
 isDrag.value = false;
 
 setGlobalPropsRef({
@@ -40,7 +45,7 @@ setGlobalPropsRef({
     {{ selectStructure?.id || '-' }}
   </p>
   <div class="flex">
-    <LayoutStructureProvide id="main" :structure="LayoutStructureProps.structure">
+    <LayoutStructureProvide id="main" :structureStore="structureStore">
       <div class="w-48">
         <LayoutTree>
           <template #item="{ structure, isSelect, isHover }">

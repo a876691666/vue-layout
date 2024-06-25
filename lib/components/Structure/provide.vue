@@ -3,14 +3,12 @@
 </template>
 <script setup lang="ts">
 import { provide } from 'vue';
-import { useStructure } from '../../core/useStructure';
+import { StructureStoreType } from '../../core/useStructure';
 import { StructureItem } from '../../types';
 
-const props = withDefaults(defineProps<{ id?: string; structure: StructureItem }>(), {});
+const props = withDefaults(defineProps<{ id?: string; structure?: StructureItem; structureStore?: StructureStoreType }>(), {});
 
 provide('structureId', props.id);
 
-const { setStructure } = useStructure(props.id);
-
-setStructure(props.structure);
+provide('structureStore', props.structureStore);
 </script>
