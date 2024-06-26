@@ -47,7 +47,7 @@ export type StructureStoreType = {
   isAlt: Ref<boolean>;
   isCtrl: Ref<boolean>;
   event: Emitter<{ updateSelectRect: void }>;
-  addStructure: (structure: StructureItem, parentUuid: string, index?: number) => void;
+  addStructure: (structure: StructureItem, parentUuid: string, index?: number) => StructureItem;
   removeStructure: (uuid: string) => void;
   updateStructure: (uuid: string, structure: StructureItem) => void;
   findStructure: (uuid: string) => Ref<StructureItem | undefined> | undefined;
