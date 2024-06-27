@@ -47,7 +47,7 @@ import { StructureItem } from '../../types';
 
 const props = withDefaults(defineProps<{ dev?: boolean; props: any; structure?: StructureItem }>(), { dev: false });
 
-const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure, isDrag, getStyleRef } = useStructure();
+const { handleSelectStructure, handleHoverStructure, selectStructure, hoverStructure, isDrag, getStyleRef, event: mevent } = useStructure();
 
 const showDrag = computed(() => isDrag.value && props.structure?.showDrag);
 
@@ -120,6 +120,8 @@ const handleStartSelectStructure = (e: MouseEvent) => {
       handleSelectStructure(event);
     }
     isDown.value = false;
+
+    mevent.emit('dragEnd', selectStructure.value);
 
     window.removeEventListener('pointermove', handleMoveSelectStructure);
     window.removeEventListener('pointerup', handleEndSelectStructure);
