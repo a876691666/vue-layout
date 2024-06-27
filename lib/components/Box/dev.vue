@@ -119,11 +119,11 @@ const handleStartSelectStructure = (e: MouseEvent) => {
     if (!isMove.value && !flag) {
       handleSelectStructure(event);
     }
-    isDown.value = false;
 
     if (isMove.value) {
       mevent.emit('dragMoveEnd', selectStructure.value);
     }
+    isDown.value = false;
 
     window.removeEventListener('pointermove', handleMoveSelectStructure);
     window.removeEventListener('pointerup', handleEndSelectStructure);
