@@ -35,7 +35,7 @@ const cacheMap: Record<
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
     selectParentStructure: Ref<string[]>;
-    event: Emitter<{ updateSelectRect: void; dragEnd: StructureItem | undefined }>;
+    event: Emitter<{ updateSelectRect: void; dragMoveEnd: StructureItem | undefined }>;
   }
 > = {};
 
@@ -46,7 +46,7 @@ const isDrag = ref(false);
 export type StructureStoreType = {
   isAlt: Ref<boolean>;
   isCtrl: Ref<boolean>;
-  event: Emitter<{ updateSelectRect: void; dragEnd: StructureItem | undefined }>;
+  event: Emitter<{ updateSelectRect: void; dragMoveEnd: StructureItem | undefined }>;
   addStructure: (structure: StructureItem, parentUuid: string, index?: number) => StructureItem;
   removeStructure: (uuid: string) => void;
   updateStructure: (uuid: string, structure: StructureItem) => void;
@@ -64,7 +64,7 @@ export type StructureStoreType = {
   setGlobalPropsRef: (props: { [key: string]: any }) => void;
   isDrag: Ref<boolean>;
   dragStart: () => void;
-  dragEnd: () => void;
+  dragMoveEnd: () => void;
   dispose: () => void;
 };
 
@@ -81,7 +81,7 @@ export const useStructure = (_id?: string): StructureStoreType => {
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let selectParentStructure = ref<Array<string>>([]);
-  let event = mitt<{ updateSelectRect: void; dragEnd: StructureItem | undefined }>();
+  let event = mitt<{ updateSelectRect: void; dragMoveEnd: StructureItem | undefined }>();
 
   const id = _id || inject<string>('structureId') || 'default';
 
@@ -368,7 +368,7 @@ export const useStructure = (_id?: string): StructureStoreType => {
     isDrag.value = true;
   };
 
-  const dragEnd = () => {
+  const dragMoveEnd = () => {
     isDrag.value = false;
   };
 
@@ -422,7 +422,7 @@ export const useStructure = (_id?: string): StructureStoreType => {
 
     isDrag,
     dragStart,
-    dragEnd,
+    dragMoveEnd,
 
     dispose,
   };
