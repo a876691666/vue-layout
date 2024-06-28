@@ -1,4 +1,4 @@
-import { Ref, inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Ref, WatchStopHandle, inject, onMounted, onUnmounted, ref, watch } from 'vue';
 import { StructureItem, StyleType, VueStructureItem } from '../types';
 import { v5 } from 'uuid';
 import mitt, { Emitter } from 'mitt';
@@ -31,6 +31,8 @@ const cacheMap: Record<
     structureMap: Map<string, Ref<StructureItem | undefined>>;
     structureStyleMap: Map<string, Ref<StyleType>>;
     structurePropsMap: Map<string, Ref<{ [key: string]: any }>>;
+    structureStyleUnwatchmap: Map<string, WatchStopHandle>;
+    structurePropsUnwatchmap: Map<string, WatchStopHandle>;
     globalPropsRef: Ref<{ [key: string]: any }>;
     selectStructure: Ref<StructureItem | undefined>;
     hoverStructure: Ref<StructureItem | undefined>;
@@ -77,6 +79,8 @@ export const useStructure = (_id?: string): StructureStoreType => {
   let _structureMap = new Map<string, Ref<StructureItem | undefined>>();
   let _structureStyleMap = new Map<string, Ref<StyleType>>();
   let _structurePropsMap = new Map<string, Ref<{ [key: string]: any }>>();
+  let _structureStyleUnwatchmap = new Map<string, WatchStopHandle>();
+  let _structurePropsUnwatchmap = new Map<string, WatchStopHandle>();
   let globalPropsRef = ref<{ [key: string]: any }>({});
   let selectStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
   let hoverStructure: Ref<StructureItem | undefined> = ref<StructureItem | undefined>();
@@ -91,6 +95,8 @@ export const useStructure = (_id?: string): StructureStoreType => {
       structureMap: _structureMap,
       structureStyleMap: _structureStyleMap,
       structurePropsMap: _structurePropsMap,
+      structureStyleUnwatchmap: _structureStyleUnwatchmap,
+      structurePropsUnwatchmap: _structurePropsUnwatchmap,
       globalPropsRef: globalPropsRef,
       selectStructure: selectStructure,
       hoverStructure: hoverStructure,
@@ -102,6 +108,8 @@ export const useStructure = (_id?: string): StructureStoreType => {
     _structureMap = cacheMap[id].structureMap;
     _structureStyleMap = cacheMap[id].structureStyleMap;
     _structurePropsMap = cacheMap[id].structurePropsMap;
+    _structureStyleUnwatchmap = cacheMap[id].structureStyleUnwatchmap;
+    _structurePropsUnwatchmap = cacheMap[id].structurePropsUnwatchmap;
     globalPropsRef = cacheMap[id].globalPropsRef;
     selectStructure = cacheMap[id].selectStructure;
     hoverStructure = cacheMap[id].hoverStructure;
@@ -134,10 +142,15 @@ export const useStructure = (_id?: string): StructureStoreType => {
     const structure = _structureMap.get(uuid);
     const styleRef = ref<StyleType>(_structureMap.get(uuid)?.value?.style || {});
 
-    watch(styleRef, (style) => {
+    _structureStyleUnwatchmap.get(uuid)?.();
+    _structureStyleMap.set(uuid, styleRef);
+
+    const unwatch = watch(styleRef, (style) => {
       if (!structure?.value) return;
       structure.value.style = style;
     });
+
+    _structureStyleUnwatchmap.set(uuid, unwatch);
 
     return styleRef;
   };
@@ -146,10 +159,15 @@ export const useStructure = (_id?: string): StructureStoreType => {
     const structure = _structureMap.get(uuid);
     const propsRef = ref(structure?.value?.props || {});
 
-    watch(propsRef, (props) => {
+    _structurePropsUnwatchmap.get(uuid)?.();
+    _structurePropsMap.set(uuid, propsRef);
+
+    const unwatch = watch(propsRef, (props) => {
       if (!structure?.value) return;
       structure.value.props = props;
     });
+
+    _structurePropsUnwatchmap.set(uuid, unwatch);
 
     return propsRef;
   };
@@ -163,28 +181,22 @@ export const useStructure = (_id?: string): StructureStoreType => {
     _structure.value = structure;
 
     _structureMap.forEach((_value, key) => {
-      _structureStyleMap.set(key, createStyleRef(key));
-      _structurePropsMap.set(key, createPropsRef(key));
+      createStyleRef(key);
+      createPropsRef(key);
     });
   };
 
   const getStyleRef = (uuid?: string) => {
     if (!uuid) return;
     let styleRef = _structureStyleMap.get(uuid);
-    if (!styleRef) {
-      styleRef = createStyleRef(uuid);
-      _structureStyleMap.set(uuid, styleRef);
-    }
+    if (!styleRef) styleRef = createStyleRef(uuid);
     return styleRef;
   };
 
   const getPropsRef = (uuid?: string) => {
     if (!uuid) return;
     let propsRef = _structurePropsMap.get(uuid);
-    if (!propsRef) {
-      propsRef = createPropsRef(uuid);
-      _structurePropsMap.set(uuid, propsRef);
-    }
+    if (!propsRef) propsRef = createPropsRef(uuid);
     return propsRef;
   };
 
@@ -294,8 +306,8 @@ export const useStructure = (_id?: string): StructureStoreType => {
     }
 
     if (!_structureMap.has(structure.uuid)) _structureMap.set(structure.uuid, ref(structure));
-    if (!_structureStyleMap.has(structure.uuid)) _structureStyleMap.set(structure.uuid, createStyleRef(structure.uuid));
-    if (!_structurePropsMap.has(structure.uuid)) _structurePropsMap.set(structure.uuid, createPropsRef(structure.uuid));
+    if (!_structureStyleMap.has(structure.uuid)) createStyleRef(structure.uuid);
+    if (!_structurePropsMap.has(structure.uuid)) createPropsRef(structure.uuid);
 
     if (parentUuid) {
       structure.parentUuid = parentUuid;
@@ -346,12 +358,12 @@ export const useStructure = (_id?: string): StructureStoreType => {
       oldStructure.type = structure.type;
     }
     if (structure.style) {
-      if (!_structureStyleMap.has(uuid)) _structureStyleMap.set(uuid, createStyleRef(uuid));
+      if (!_structureStyleMap.has(uuid)) createStyleRef(uuid);
       const styleRef = _structureStyleMap.get(uuid);
       if (styleRef) styleRef.value = structure.style;
     }
     if (structure.props) {
-      if (!_structurePropsMap.has(uuid)) _structurePropsMap.set(uuid, createPropsRef(uuid));
+      if (!_structurePropsMap.has(uuid)) createPropsRef(uuid);
       const propsRef = _structurePropsMap.get(uuid);
       if (propsRef) propsRef.value = structure.props;
     }
