@@ -138,34 +138,42 @@ export const useStructure = (_id?: string): StructureStoreType => {
     return [...getParentUuids(structure.value?.parentUuid), uuid];
   };
 
-  const createStyleRef = (uuid: string) => {
+  const createStyleRef = (uuid: string, style?: any) => {
     const structure = _structureMap.get(uuid);
-    const styleRef = ref<StyleType>(_structureMap.get(uuid)?.value?.style || {});
+    const styleRef = ref<StyleType>(style || structure?.value?.style || {});
 
     _structureStyleUnwatchmap.get(uuid)?.();
     _structureStyleMap.set(uuid, styleRef);
 
-    const unwatch = watch(styleRef, (style) => {
-      if (!structure?.value) return;
-      structure.value.style = style;
-    });
+    const unwatch = watch(
+      styleRef,
+      (style) => {
+        if (!structure?.value) return;
+        structure.value.style = style;
+      },
+      { immediate: true }
+    );
 
     _structureStyleUnwatchmap.set(uuid, unwatch);
 
     return styleRef;
   };
 
-  const createPropsRef = (uuid: string) => {
+  const createPropsRef = (uuid: string, props?: any) => {
     const structure = _structureMap.get(uuid);
-    const propsRef = ref(structure?.value?.props || {});
+    const propsRef = ref(props || structure?.value?.props || {});
 
     _structurePropsUnwatchmap.get(uuid)?.();
     _structurePropsMap.set(uuid, propsRef);
 
-    const unwatch = watch(propsRef, (props) => {
-      if (!structure?.value) return;
-      structure.value.props = props;
-    });
+    const unwatch = watch(
+      propsRef,
+      (props) => {
+        if (!structure?.value) return;
+        structure.value.props = props;
+      },
+      { immediate: true }
+    );
 
     _structurePropsUnwatchmap.set(uuid, unwatch);
 
@@ -358,14 +366,10 @@ export const useStructure = (_id?: string): StructureStoreType => {
       oldStructure.type = structure.type;
     }
     if (structure.style) {
-      if (!_structureStyleMap.has(uuid)) createStyleRef(uuid);
-      const styleRef = _structureStyleMap.get(uuid);
-      if (styleRef) styleRef.value = structure.style;
+      createStyleRef(uuid, structure.style);
     }
     if (structure.props) {
-      if (!_structurePropsMap.has(uuid)) createPropsRef(uuid);
-      const propsRef = _structurePropsMap.get(uuid);
-      if (propsRef) propsRef.value = structure.props;
+      createPropsRef(uuid, structure.props);
     }
     if (structure.children) {
       oldStructure.children = structure.children;

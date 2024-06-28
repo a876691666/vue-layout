@@ -22,7 +22,44 @@ const LayoutStructureProps = {
         ],
       },
       { style: { left: '100px', top: '100px' }, type: 'block', positionLeaf: true, dragTop: true, id: 'menu' },
-      { style: { left: '600px', top: '600px' }, type: 'block', positionLeaf: true, id: 'footer' },
+      {
+        style: { left: '600px', top: '600px' },
+        type: 'block',
+        positionLeaf: true,
+        id: 'footer',
+        children: [
+          {
+            type: 'vue',
+            id: 'component-div',
+            component: 'TestVue',
+            children: [
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+            ],
+          },
+          {
+            type: 'vue',
+            id: 'component-div',
+            component: 'TestVue',
+            children: [
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+            ],
+          },
+          {
+            type: 'vue',
+            id: 'component-div',
+            component: 'TestVue',
+            children: [
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+              { type: 'vue', id: 'component-div', component: 'TestVue' },
+            ],
+          },
+        ],
+      },
     ],
   } as StructureItem,
 };

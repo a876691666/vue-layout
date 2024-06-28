@@ -11,6 +11,7 @@
     }"
     :structure="structureAgent"
     v-show="!structureAgent?.hidden"
+    v-memo="[styleRef?.left, styleRef?.top, styleRef?.width, styleRef?.height]"
   >
     <template #_tools="{ structure }">
       <slot name="_tools" :structure="structure" />
@@ -97,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { Ref, computed, ref } from 'vue';
 import { StructureItem, StyleType } from '../../types';
 import { LayoutDevBox } from '.';
 import { useStructure } from '../../core/useStructure';
@@ -116,11 +117,15 @@ defineSlots<{
 
 const { getStyleRef, getPropsRef, getGlobalPropsRef, findStructure } = useStructure();
 const structureAgent = findStructure(props.structure?.uuid || '');
-const styleRef = getStyleRef(props.structure?.uuid);
-const propsRef = getPropsRef(props.structure?.uuid);
+
 const globalPropsRef = getGlobalPropsRef();
-const getCurrentStyleRef = () => styleRef;
-const getCurrentPropsRef = () => propsRef;
+
+const getCurrentStyleRef = () => getStyleRef(props.structure?.uuid);
+const getCurrentPropsRef = () => getPropsRef(props.structure?.uuid);
+
+const styleRef = computed(() => getCurrentStyleRef()?.value);
+
+const propsRef = computed(() => getCurrentPropsRef()?.value);
 
 const layoutType = ref(props.structure?.type);
 
